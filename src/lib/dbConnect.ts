@@ -14,8 +14,7 @@ interface MongooseGlobal {
 
 // Declare global type to extend NodeJS.Global
 declare global {
-  // This makes sure TypeScript knows we’re attaching `mongoose` on global
-  var mongoose: MongooseGlobal | undefined;
+  let mongoose: MongooseGlobal | undefined;
 }
 
 // Initialize global cache if not already
