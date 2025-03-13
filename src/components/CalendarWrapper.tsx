@@ -5,26 +5,33 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 
-interface CalendarWrapperProps {
-  events: any[]; // Adjust this type based on your event data
-  onEventClick: (eventId: string) => void;
-  fetchEvents: () => void;
+interface EventData {
+  _id: string;
+  title: string;
+  date: string;
+  time?: string;
 }
 
-const CalendarWrapper = ({ events, onEventClick, fetchEvents }: CalendarWrapperProps) => {
-  const formattedEvents = events.map(event => ({
+interface CalendarWrapperProps {
+  events: EventData[];
+  onEventClick: (eventId: string) => void;
+  // Removed fetchEvents if not needed
+}
+
+const CalendarWrapper = ({ events, onEventClick }: CalendarWrapperProps) => {
+  const formattedEvents = events.map((event) => ({
     title: event.title,
-    start: event.date, // or adjust based on your event object structure
-    end: event.time ? `${event.date}T${event.time}` : undefined, // Handling time if exists
-    id: event._id, // Assuming MongoDB ObjectId or another unique identifier
+    start: event.date,
+    end: event.time ? `${event.date}T${event.time}` : undefined,
+    id: event._id,
   }));
 
   return (
     <FullCalendar
       plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
       initialView="dayGridMonth"
-      events={formattedEvents} // Pass the formatted events to FullCalendar
-      eventClick={(info) => onEventClick(info.event.id)} // Handle event click
+      events={formattedEvents}
+      eventClick={(info) => onEventClick(info.event.id)}
       headerToolbar={{
         left: 'prev,next today',
         center: 'title',
