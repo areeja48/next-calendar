@@ -1,5 +1,5 @@
 // lib/dbConnect.ts
-import mongoose from 'mongoose';
+import mongoose, { Connection } from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -7,30 +7,33 @@ if (!MONGODB_URI) {
   throw new Error('⚠️ MONGODB_URI not defined in environment variables');
 }
 
-let cached = (global as any).mongoose;
-
-if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+interface MongooseGlobal {
+  conn: Connection | null;
+  promise: Promise<Connection> | null;
 }
 
-export default async function dbConnect() {
-  if (cached.conn) {
-    return cached.conn;
-  }
+// Declare global type to extend NodeJS.Global
+declare global {
+  // This makes sure TypeScript knows we’re attaching `mongoose` on global
+  var mongoose: MongooseGlobal | undefined;
+}
 
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
+// Initialize global cache if not already
+const globalCache: MongooseGlobal = global.mongoose ?? { conn: null, promise: null };
+
+export default async function dbConnect(): Promise<Connection> {
+  if (globalCache.conn) return globalCache.conn;
+
+  if (!globalCache.promise) {
+    globalCache.promise = mongoose.connect(MONGODB_URI, {
       dbName: 'calendar',
       bufferCommands: false,
-    });
+    }).then(m => m.connection);
   }
 
-  try {
-    cached.conn = await cached.promise;
-    console.log('✅ MongoDB connected');
-    return cached.conn;
-  } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
-    throw error;
-  }
+  globalCache.conn = await globalCache.promise;
+  global.mongoose = globalCache; // Set it to global for reuse in next calls
+
+  console.log('✅ MongoDB connected');
+  return globalCache.conn;
 }
