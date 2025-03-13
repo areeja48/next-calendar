@@ -6,15 +6,23 @@ import FloatingActionButton from '@/components/FAB';
 import CalendarWrapper from '@/components/CalendarWrapper';
 import EventModel from '@/components/EventModel';
 
+// ✅ Define a proper event type instead of using `any`
+interface EventData {
+  _id: string;
+  title: string;
+  date: string;
+  time?: string;
+}
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<EventData[]>([]); // ✅ Correct type here
 
   const fetchEvents = async () => {
     const res = await fetch('/api/events');
-    const data = await res.json();
+    const data: EventData[] = await res.json(); // ✅ Type your response too
     setEvents(data);
   };
 
@@ -59,12 +67,10 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      
-
       <main className="flex-1 p-20 overflow-y-auto">
         <CalendarWrapper
           events={events}
-          onEventClick={(eventId: string) => handleEdit(eventId)} // Set edit mode for clicked event
+          onEventClick={handleEdit}
           fetchEvents={fetchEvents}
         />
       </main>
@@ -75,7 +81,7 @@ export default function DashboardPage() {
         open={open}
         onClose={() => {
           setOpen(false);
-          setEditingId(null); // Reset editingId when closing modal
+          setEditingId(null);
         }}
         editingId={editingId}
         fetchEvents={fetchEvents}
