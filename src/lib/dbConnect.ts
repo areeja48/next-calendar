@@ -1,36 +1,42 @@
 // lib/dbConnect.ts
 import mongoose, { Connection } from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI: string = process.env.MONGODB_URI as string;
 
 if (!MONGODB_URI) {
   throw new Error('⚠️ MONGODB_URI is not defined in environment variables');
 }
 
-// Global cache interface for serverless
+// Define global cache interface
 interface MongooseGlobal {
   conn: Connection | null;
   promise: Promise<Connection> | null;
 }
 
-// Attach to globalThis to avoid multiple connections in serverless
-const globalCache: MongooseGlobal = (global as any).mongoose ?? {
+// Extend globalThis with mongoose property
+declare global {
+  // Allow this file to be compiled as a module
+  // without affecting other files
+  var mongooseGlobal: MongooseGlobal | undefined;
+}
+
+const globalCache: MongooseGlobal = globalThis.mongooseGlobal ?? {
   conn: null,
   promise: null,
 };
 
-if (!(global as any).mongoose) {
-  (global as any).mongoose = globalCache;
+if (!globalThis.mongooseGlobal) {
+  globalThis.mongooseGlobal = globalCache;
 }
 
 export default async function dbConnect(): Promise<Connection> {
   if (globalCache.conn) return globalCache.conn;
 
   if (!globalCache.promise) {
-    globalCache.promise = mongoose.connect(MONGODB_URI!, {
+    globalCache.promise = mongoose.connect(MONGODB_URI, {
       dbName: 'calendar',
       bufferCommands: false,
-    }).then(m => m.connection);
+    }).then((m) => m.connection);
   }
 
   globalCache.conn = await globalCache.promise;
