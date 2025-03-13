@@ -5,14 +5,14 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 export default function SignInPage() {
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const router = useRouter()
 
   useEffect(() => {
     if (status === 'authenticated') {
       router.push('/dashboard')
     }
-  }, [status])
+  }, [status, router])
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
