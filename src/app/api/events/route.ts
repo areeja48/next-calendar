@@ -1,48 +1,31 @@
-// app/api/events/route.ts
-import dbConnect from '@/lib/dbConnect';
-import Event from '@/models/Event';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { NextResponse } from 'next/server';
+// /app/api/events/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import connectDB from "@/lib/mongodb";
+import Event from "@/models/eventmodel";
 
-// GET: Fetch user events
-export async function GET() {
+// Handle GET and POST in one file
+export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json([], { status: 200 });
-    }
-
-    await dbConnect();
-    const events = await Event.find({ userEmail: session.user.email });
-
+    await connectDB();
+    const events = await Event.find().sort({ date: 1 });
     return NextResponse.json(events, { status: 200 });
-  } catch (err: unknown) {
-    console.error('❌ GET /api/events error:', (err as Error).message);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    return NextResponse.json({ message: "Failed to fetch events" }, { status: 500 });
   }
 }
 
-// POST: Create new event
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    await connectDB();
+    const { title, date, time } = await req.json();
 
-    const { title, date } = await req.json();
+    const newEvent = new Event({ title, date, time });
+    await newEvent.save();
 
-    if (!title || !date) {
-      return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
-    }
-
-    await dbConnect();
-    await Event.create({ title, date, userEmail: session.user.email });
-
-    return NextResponse.json({ message: 'Event created' }, { status: 201 });
-  } catch (err: unknown) {
-    console.error('❌ POST /api/events error:', (err as Error).message);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    return NextResponse.json({ message: "Event created successfully", event: newEvent }, { status: 201 });
+  } catch (error) {
+    console.error("Error creating event:", error);
+    return NextResponse.json({ message: "Failed to create event" }, { status: 500 });
   }
 }
