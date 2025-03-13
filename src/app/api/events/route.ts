@@ -20,6 +20,9 @@ export async function POST(req: Request) {
   const { title, date } = await req.json()
   await dbConnect()
   await Event.create({ title, date, userEmail: session.user.email })
-
+  console.log('🔍 Connecting to MongoDB...');
+  await dbConnect();
+  console.log('✅ MongoDB connected.');
+  
   return NextResponse.json({ message: 'Event added' })
 }
