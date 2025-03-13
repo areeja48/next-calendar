@@ -11,11 +11,10 @@ interface EventData {
   date: string;
   time?: string;
 }
-
 interface CalendarWrapperProps {
   events: EventData[];
   onEventClick: (eventId: string) => void;
-  // Removed fetchEvents if not needed
+  fetchEvents: () => Promise<void>; // ✅ Add this line
 }
 
 const CalendarWrapper = ({ events, onEventClick }: CalendarWrapperProps) => {
