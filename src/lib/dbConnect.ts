@@ -1,37 +1,20 @@
-import mongoose, { Mongoose } from 'mongoose'
+// lib/dbConnect.ts
+import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI!
+let isConnected = false; // Track connection status
 
-if (!MONGODB_URI) throw new Error('Please define MONGODB_URI in .env.local')
+export default async function dbConnect() {
+  if (isConnected) return;
 
-// Properly typed global mongoose cache
-interface MongooseGlobal {
-  conn: Mongoose | null
-  promise: Promise<Mongoose> | null
-}
+  try {
+    const db = await mongoose.connect(process.env.MONGODB_URI!, {
+      dbName: 'calendar',
+    });
 
-const globalWithMongoose = global as typeof globalThis & {
-  mongoose: MongooseGlobal
-}
-
-const cached: MongooseGlobal = globalWithMongoose.mongoose || {
-  conn: null,
-  promise: null,
-}
-
-async function dbConnect(): Promise<Mongoose> {
-  if (cached.conn) return cached.conn
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
-      bufferCommands: false,
-    })
+    isConnected = true;
+    console.log('✅ MongoDB connected');
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err);
+    throw err;
   }
-
-  cached.conn = await cached.promise
-  globalWithMongoose.mongoose = cached // assign the cache globally
-
-  return cached.conn
 }
-
-export default dbConnect
