@@ -13,7 +13,7 @@ const EventModal = ({ open, onClose, editingId, fetchEvents }: EventModalProps) 
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [userEmail, setUserEmail] = useState("");
+  
 
   // Fetch event details when editing
   useEffect(() => {
@@ -24,14 +24,14 @@ const EventModal = ({ open, onClose, editingId, fetchEvents }: EventModalProps) 
         setTitle(data.title);
         setDate(data.date);
         setTime(data.time || "");
-        setUserEmail(data.userEmail);
+        
       };
       fetchEventDetails();
     } else {
       setTitle("");
       setDate("");
       setTime("");
-      setUserEmail("");
+
     }
   }, [editingId]);
 
@@ -42,7 +42,6 @@ const EventModal = ({ open, onClose, editingId, fetchEvents }: EventModalProps) 
       title,
       date,
       time,
-      userEmail,
     };
 
     // Handle Create or Update based on editingId
@@ -110,17 +109,6 @@ const EventModal = ({ open, onClose, editingId, fetchEvents }: EventModalProps) 
                 id="time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="userEmail" className="block text-sm font-medium text-gray-700">User Email</label>
-              <input
-                type="email"
-                id="userEmail"
-                value={userEmail}
-                onChange={(e) => setUserEmail(e.target.value)}
-                required
                 className="w-full p-2 border border-gray-300 rounded-md"
               />
             </div>

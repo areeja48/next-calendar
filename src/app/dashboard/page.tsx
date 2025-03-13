@@ -2,11 +2,9 @@
 
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
 import FloatingActionButton from '@/components/FAB';
 import CalendarWrapper from '@/components/CalendarWrapper';
 import EventModel from '@/components/EventModel';
-import ThemeToggle from '@/components/ThemeToggle';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -61,7 +59,7 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      <Sidebar />
+      
 
       <main className="flex-1 p-20 overflow-y-auto">
         <CalendarWrapper
@@ -82,8 +80,6 @@ export default function DashboardPage() {
         editingId={editingId}
         fetchEvents={fetchEvents}
       />
-
-     { /*<ThemeToggle />*/}
     </div>
   );
 }
