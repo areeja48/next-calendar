@@ -1,49 +1,20 @@
-import mongoose, { Connection } from 'mongoose';
+import mongoose from 'mongoose'
 
-const MONGODB_URI: string = process.env.MONGODB_URI as string;
+const MONGODB_URI = process.env.MONGODB_URI!
 
-if (!MONGODB_URI) {
-  throw new Error('⚠️ MONGODB_URI is not defined in environment variables');
-}
+if (!MONGODB_URI) throw new Error('Please define MONGODB_URI in .env.local')
 
-// Define global cache interface
-interface MongooseGlobal {
-  conn: Connection | null;
-  promise: Promise<Connection> | null;
-}
+let cached = (global as any).mongoose || { conn: null, promise: null }
 
-// Extend globalThis with mongoose property
-declare global {
-  // This will add a custom property on globalThis
-  // You can still use `let` for assigning later
-  interface Global {
-    mongooseGlobal?: MongooseGlobal;
-  }
-
-  // Correct typing for globalThis
-  var mongooseGlobal: MongooseGlobal | undefined;
-}
-
-// Use `let` instead of `var`
-let globalCache: MongooseGlobal = globalThis.mongooseGlobal ?? {
-  conn: null,
-  promise: null,
-};
-
-if (!globalThis.mongooseGlobal) {
-  globalThis.mongooseGlobal = globalCache;
-}
-
-export default async function dbConnect(): Promise<Connection> {
-  if (globalCache.conn) return globalCache.conn;
-
-  if (!globalCache.promise) {
-    globalCache.promise = mongoose.connect(MONGODB_URI, {
-      dbName: 'calendar',
+async function dbConnect() {
+  if (cached.conn) return cached.conn
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
-    }).then((m) => m.connection);
+    })
   }
-
-  globalCache.conn = await globalCache.promise;
-  return globalCache.conn;
+  cached.conn = await cached.promise
+  return cached.conn
 }
+
+export default dbConnect
