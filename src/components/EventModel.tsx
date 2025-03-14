@@ -1,19 +1,26 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from 'react';
 
 interface EventModalProps {
   open: boolean;
   onClose: () => void;
   editingId: string | null;
-  selectedDate: string | null;
   fetchEvents: () => void;
+  selectedDate?: string;
 }
 
-const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: EventModalProps) => {
-  const [title, setTitle] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
+export default function EventModal({
+  open,
+  onClose,
+  editingId,
+  fetchEvents,
+  selectedDate,
+}: EventModalProps) {
+  const [title, setTitle] = useState('');
+  const [date, setDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
 
   useEffect(() => {
     if (editingId) {
@@ -21,32 +28,39 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         const res = await fetch(`/api/events/${editingId}`);
         const data = await res.json();
         setTitle(data.title);
-        setDate(data.date);
-        setTime(data.time || "");
+        setDate(data.start.split('T')[0]);
+        setStartTime(data.start?.split('T')[1]?.slice(0, 5) || '');
+        setEndTime(data.end?.split('T')[1]?.slice(0, 5) || '');
       };
       fetchEventDetails();
+    } else if (selectedDate) {
+      setDate(selectedDate);
     } else {
-      setTitle("");
-      setDate(selectedDate || "");
-      setTime("");
+      setTitle('');
+      setDate('');
+      setStartTime('');
+      setEndTime('');
     }
   }, [editingId, selectedDate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const eventData = { title, date, time };
+    const start = `${date}T${startTime}`;
+    const end = `${date}T${endTime}`;
+
+    const payload = { title, start, end };
 
     if (editingId) {
       await fetch(`/api/events/${editingId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(eventData),
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
     } else {
-      await fetch("/api/events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(eventData),
+      await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
     }
 
@@ -56,64 +70,79 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
 
   const handleDelete = async () => {
     if (editingId) {
-      await fetch(`/api/events/${editingId}`, { method: "DELETE" });
-      onClose();
+      await fetch(`/api/events/${editingId}`, { method: 'DELETE' });
       fetchEvents();
+      onClose();
     }
   };
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-xl w-96 shadow-lg">
-        <h2 className="text-2xl font-semibold mb-4">{editingId ? "Edit Event" : "Create Event"}</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
+        <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit Event' : 'Create Event'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="title" className="block text-sm font-medium">Title</label>
+            <label className="block text-sm mb-1">Title</label>
             <input
-              id="title"
               type="text"
+              className="w-full border px-3 py-2 rounded-md"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              className="w-full p-2 border rounded-md"
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="date" className="block text-sm font-medium">Date</label>
+            <label className="block text-sm mb-1">Date</label>
             <input
-              id="date"
               type="date"
+              className="w-full border px-3 py-2 rounded-md"
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
-              className="w-full p-2 border rounded-md"
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="time" className="block text-sm font-medium">Time</label>
+            <label className="block text-sm mb-1">Start Time</label>
             <input
-              id="time"
               type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className="w-full p-2 border rounded-md"
+              className="w-full border px-3 py-2 rounded-md"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm mb-1">End Time</label>
+            <input
+              type="time"
+              className="w-full border px-3 py-2 rounded-md"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
             />
           </div>
           <div className="flex justify-between">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded-md">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md">
-              {editingId ? "Update Event" : "Create Event"}
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-300 rounded-md"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md"
+            >
+              {editingId ? 'Update' : 'Create'}
             </button>
           </div>
         </form>
-
         {editingId && (
           <div className="mt-4 text-center">
             <button
               onClick={handleDelete}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              className="text-red-600 hover:underline"
             >
               Delete Event
             </button>
@@ -122,6 +151,4 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
       </div>
     </div>
   );
-};
-
-export default EventModal;
+}

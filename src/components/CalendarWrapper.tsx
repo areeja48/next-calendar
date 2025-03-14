@@ -4,29 +4,31 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
-import interactionPlugin from '@fullcalendar/interaction'; // For date click
-import { EventClickArg } from '@fullcalendar/core';
-import { DateClickArg } from '@fullcalendar/interaction';
-
+import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 
 interface EventData {
   _id: string;
   title: string;
-  date: string;
-  time?: string;
+  start: string;
+  end?: string;
 }
 
 interface CalendarWrapperProps {
   events: EventData[];
   onEventClick: (eventId: string) => void;
-  onDateClick: (dateStr: string) => void;
+  onDateClick: (dateInfo: DateClickArg) => void;
 }
 
-const CalendarWrapper = ({ events, onEventClick, onDateClick }: CalendarWrapperProps) => {
+export default function CalendarWrapper({
+  events,
+  onEventClick,
+  onDateClick,
+}: CalendarWrapperProps) {
   const formattedEvents = events.map((event) => ({
-    id: event._id,
     title: event.title,
-    start: event.time ? `${event.date}T${event.time}` : event.date,
+    start: event.start,
+    end: event.end,
+    id: event._id,
   }));
 
   return (
@@ -34,16 +36,13 @@ const CalendarWrapper = ({ events, onEventClick, onDateClick }: CalendarWrapperP
       plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
       initialView="dayGridMonth"
       events={formattedEvents}
-      eventClick={(info: EventClickArg) => onEventClick(info.event.id)}
-      dateClick={(info: DateClickArg) => onDateClick(info.dateStr)}
+      eventClick={(info) => onEventClick(info.event.id)}
+      dateClick={onDateClick}
       headerToolbar={{
         left: 'prev,next today',
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
       }}
-      height="auto"
     />
   );
-};
-
-export default CalendarWrapper;
+}

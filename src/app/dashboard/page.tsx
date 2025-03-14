@@ -2,33 +2,29 @@
 
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import FloatingActionButton from '@/components/FAB';
 import CalendarWrapper from '@/components/CalendarWrapper';
-import EventModel from '@/components/EventModel';
+import EventModal from '@/components/EventModel';
+import FloatingActionButton from '@/components/FAB';
+import { DateClickArg } from '@fullcalendar/interaction';
 
-// ✅ Define a proper event type
 interface EventData {
   _id: string;
   title: string;
-  date: string;
-  time?: string;
+  start: string;
+  end?: string;
 }
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [events, setEvents] = useState<EventData[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined);
 
   const fetchEvents = async () => {
-    try {
-      const res = await fetch('/api/events');
-      const data: EventData[] = await res.json();
-      setEvents(data);
-    } catch (error) {
-      console.error('Error fetching events:', error);
-    }
+    const res = await fetch('/api/events');
+    const data = await res.json();
+    setEvents(data);
   };
 
   useEffect(() => {
@@ -37,31 +33,27 @@ export default function DashboardPage() {
 
   const handleCreate = () => {
     setEditingId(null);
-    setSelectedDate(null);
+    setSelectedDate(undefined);
     setOpen(true);
   };
 
   const handleEdit = (eventId: string) => {
     setEditingId(eventId);
-    setSelectedDate(null);
     setOpen(true);
   };
 
-  const handleDateClick = (dateStr: string) => {
+  const handleDateClick = (info: DateClickArg) => {
     setEditingId(null);
-    setSelectedDate(dateStr);
+    setSelectedDate(info.dateStr);
     setOpen(true);
   };
 
-  if (status === 'loading') return <div className="p-6">Loading...</div>;
+  if (status === 'loading') return <div>Loading...</div>;
 
   if (!session) {
     return (
       <div className="p-6">
-        <button
-          onClick={() => signIn()}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
+        <button onClick={() => signIn()} className="bg-blue-600 text-white px-4 py-2 rounded">
           Sign in with Google
         </button>
       </div>
@@ -69,40 +61,33 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden relative">
-      {/* Sign Out Button */}
+    <div className="relative h-screen">
       <div className="absolute top-4 right-4 z-50">
-        <button
-          onClick={() => signOut()}
-          className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
-        >
+        <button onClick={() => signOut()} className="bg-red-500 text-white px-4 py-2 rounded">
           Sign Out
         </button>
       </div>
 
-      {/* Calendar */}
-      <main className="flex-1 p-6 overflow-y-auto">
+      <main className="p-4">
         <CalendarWrapper
           events={events}
           onEventClick={handleEdit}
-          onDateClick={handleDateClick} // ✅ handle date click
+          onDateClick={handleDateClick}
         />
       </main>
 
-      {/* Floating Button for New Event */}
       {!open && <FloatingActionButton onClick={handleCreate} />}
 
-      {/* Event Modal */}
-      <EventModel
+      <EventModal
         open={open}
         onClose={() => {
           setOpen(false);
           setEditingId(null);
-          setSelectedDate(null);
+          setSelectedDate(undefined);
         }}
         editingId={editingId}
-        fetchEvents={fetchEvents}
         selectedDate={selectedDate}
+        fetchEvents={fetchEvents}
       />
     </div>
   );
