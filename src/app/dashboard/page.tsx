@@ -68,7 +68,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Calendar */}
-      <main className="flex-1 p-6 overflow-y-auto">
+      <main className="flex-1 p-20 overflow-y-auto">
         <CalendarWrapper
           events={events}
           onEventClick={handleEdit}
