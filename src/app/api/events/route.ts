@@ -28,13 +28,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { title, date, time } = await req.json();
+    const { title, date, startTime, endTime } = await req.json(); // ✅ updated
     await dbConnect();
 
     const newEvent = await Event.create({
       title,
       date,
-      time,
+      startTime, // ✅ new field
+      endTime,   // ✅ new field
       userEmail: session.user.email,
     });
 

@@ -8,12 +8,12 @@ import interactionPlugin from '@fullcalendar/interaction'; // For date click
 import { EventClickArg } from '@fullcalendar/core';
 import { DateClickArg } from '@fullcalendar/interaction';
 
-
 interface EventData {
   _id: string;
   title: string;
   date: string;
-  time?: string;
+  startTime?: string;
+  endTime?: string;
 }
 
 interface CalendarWrapperProps {
@@ -26,7 +26,8 @@ const CalendarWrapper = ({ events, onEventClick, onDateClick }: CalendarWrapperP
   const formattedEvents = events.map((event) => ({
     id: event._id,
     title: event.title,
-    start: event.time ? `${event.date}T${event.time}` : event.date,
+    start: event.startTime ? `${event.date}T${event.startTime}` : event.date,
+    end: event.endTime ? `${event.date}T${event.endTime}` : undefined,
   }));
 
   return (

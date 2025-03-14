@@ -13,7 +13,8 @@ interface EventModalProps {
 const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: EventModalProps) => {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
 
   useEffect(() => {
     if (editingId) {
@@ -22,19 +23,21 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         const data = await res.json();
         setTitle(data.title);
         setDate(data.date);
-        setTime(data.time || "");
+        setStartTime(data.startTime || "");
+        setEndTime(data.endTime || "");
       };
       fetchEventDetails();
     } else {
       setTitle("");
       setDate(selectedDate || "");
-      setTime("");
+      setStartTime("");
+      setEndTime("");
     }
   }, [editingId, selectedDate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const eventData = { title, date, time };
+    const eventData = { title, date, startTime, endTime };
 
     if (editingId) {
       await fetch(`/api/events/${editingId}`, {
@@ -92,12 +95,24 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="time" className="block text-sm font-medium">Time</label>
+            <label htmlFor="startTime" className="block text-sm font-medium">Start Time</label>
             <input
-              id="time"
+              id="startTime"
               type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              required
+              className="w-full p-2 border rounded-md"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="endTime" className="block text-sm font-medium">End Time</label>
+            <input
+              id="endTime"
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              required
               className="w-full p-2 border rounded-md"
             />
           </div>

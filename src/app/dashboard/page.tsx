@@ -2,17 +2,18 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // ✅ Import useRouter for redirect
+import { useRouter } from 'next/navigation';
 import FloatingActionButton from '@/components/FAB';
 import CalendarWrapper from '@/components/CalendarWrapper';
-import EventModel from '@/components/EventModel';
+import EventModel from '@/components/EventModel'; // Make sure it's correctly named
 
-// ✅ Define a proper event type
+// ✅ Updated event type
 interface EventData {
   _id: string;
   title: string;
   date: string;
-  time?: string;
+  startTime?: string;
+  endTime?: string;
 }
 
 export default function DashboardPage() {
@@ -40,14 +41,12 @@ export default function DashboardPage() {
     }
   }, [session]);
 
-  // ✅ Redirect unauthenticated users to "/"
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/');
     }
   }, [status, router]);
 
-  // ✅ Show loading screen while session is loading
   if (status === 'loading') {
     return (
       <div className="h-screen flex items-center justify-center text-gray-700 dark:text-white">
@@ -73,7 +72,7 @@ export default function DashboardPage() {
         <CalendarWrapper
           events={events}
           onEventClick={handleEdit}
-          onDateClick={handleDateClick} // ✅ handle date click
+          onDateClick={handleDateClick}
         />
       </main>
 
@@ -95,7 +94,7 @@ export default function DashboardPage() {
     </div>
   );
 
-  // ✅ Event Handlers
+  // Handlers
   function handleCreate() {
     setEditingId(null);
     setSelectedDate(null);
