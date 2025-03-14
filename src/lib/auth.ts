@@ -12,6 +12,7 @@ export const authOptions: AuthOptions = {
   ],
   pages: {
     signIn: '/dashboard',
+    signOut: '/', // send unauthenticated users here
   },
   session: {
     strategy: 'jwt',
