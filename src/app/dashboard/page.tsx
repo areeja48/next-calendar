@@ -55,7 +55,7 @@ export default function DashboardPage() {
 
   if (status === 'loading') return <div className="p-6">Loading...</div>;
 
-  if (!session) {
+  {/*if (!session) {
     return (
       <div className="p-6">
         <button
@@ -66,7 +66,7 @@ export default function DashboardPage() {
         </button>
       </div>
     );
-  }
+  }*/}
 
   return (
     <div className="flex h-screen overflow-hidden relative">
