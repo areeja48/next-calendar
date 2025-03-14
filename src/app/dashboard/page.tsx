@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import FloatingActionButton from '@/components/FAB';
 import CalendarWrapper from '@/components/CalendarWrapper';
