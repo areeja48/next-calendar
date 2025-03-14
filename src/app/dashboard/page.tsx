@@ -54,8 +54,7 @@ export default function DashboardPage() {
   };
 
   if (status === 'loading') return <div className="p-6">Loading...</div>;
-
-  {/*if (!session) {
+{/*if (!session) {
     return (
       <div className="p-6">
         <button
@@ -73,7 +72,7 @@ export default function DashboardPage() {
       {/* Sign Out Button */}
       <div className="absolute top-4 right-4 z-50">
         <button
-          onClick={() => signOut()}
+          onClick={() => signOut({ callbackUrl: '/' })}
           className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
         >
           Sign Out
