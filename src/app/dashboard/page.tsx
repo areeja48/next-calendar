@@ -6,7 +6,7 @@ import FloatingActionButton from '@/components/FAB';
 import CalendarWrapper from '@/components/CalendarWrapper';
 import EventModel from '@/components/EventModel';
 
-// ✅ Define a proper event type instead of using `any`
+// ✅ Define a proper event type
 interface EventData {
   _id: string;
   title: string;
@@ -18,12 +18,17 @@ export default function DashboardPage() {
   const { data: session, status } = useSession();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [events, setEvents] = useState<EventData[]>([]); // ✅ Correct type here
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [events, setEvents] = useState<EventData[]>([]);
 
   const fetchEvents = async () => {
-    const res = await fetch('/api/events');
-    const data: EventData[] = await res.json(); // ✅ Type your response too
-    setEvents(data);
+    try {
+      const res = await fetch('/api/events');
+      const data: EventData[] = await res.json();
+      setEvents(data);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
   };
 
   useEffect(() => {
@@ -31,12 +36,20 @@ export default function DashboardPage() {
   }, [session]);
 
   const handleCreate = () => {
-    setEditingId(null); // Reset the editingId for new event creation
+    setEditingId(null);
+    setSelectedDate(null);
     setOpen(true);
   };
 
   const handleEdit = (eventId: string) => {
-    setEditingId(eventId); // Set editingId for editing an existing event
+    setEditingId(eventId);
+    setSelectedDate(null);
+    setOpen(true);
+  };
+
+  const handleDateClick = (dateStr: string) => {
+    setEditingId(null);
+    setSelectedDate(dateStr);
     setOpen(true);
   };
 
@@ -67,24 +80,29 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      <main className="flex-1 p-20 overflow-y-auto">
+      {/* Calendar */}
+      <main className="flex-1 p-6 overflow-y-auto">
         <CalendarWrapper
           events={events}
           onEventClick={handleEdit}
-          fetchEvents={fetchEvents}
+          onDateClick={handleDateClick} // ✅ handle date click
         />
       </main>
 
+      {/* Floating Button for New Event */}
       {!open && <FloatingActionButton onClick={handleCreate} />}
 
+      {/* Event Modal */}
       <EventModel
         open={open}
         onClose={() => {
           setOpen(false);
           setEditingId(null);
+          setSelectedDate(null);
         }}
         editingId={editingId}
         fetchEvents={fetchEvents}
+        selectedDate={selectedDate}
       />
     </div>
   );
