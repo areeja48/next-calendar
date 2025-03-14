@@ -2,6 +2,7 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation'; // ✅ Import useRouter for redirect
 import FloatingActionButton from '@/components/FAB';
 import CalendarWrapper from '@/components/CalendarWrapper';
 import EventModel from '@/components/EventModel';
@@ -16,6 +17,8 @@ interface EventData {
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
+  const router = useRouter();
+
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -32,40 +35,26 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    if (session) fetchEvents();
+    if (session) {
+      fetchEvents();
+    }
   }, [session]);
 
-  const handleCreate = () => {
-    setEditingId(null);
-    setSelectedDate(null);
-    setOpen(true);
-  };
+  // ✅ Redirect unauthenticated users to "/"
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/');
+    }
+  }, [status, router]);
 
-  const handleEdit = (eventId: string) => {
-    setEditingId(eventId);
-    setSelectedDate(null);
-    setOpen(true);
-  };
-
-  const handleDateClick = (dateStr: string) => {
-    setEditingId(null);
-    setSelectedDate(dateStr);
-    setOpen(true);
-  };
-
-  if (status === 'loading') return <div className="p-6">Loading...</div>;
-{/*if (!session) {
+  // ✅ Show loading screen while session is loading
+  if (status === 'loading') {
     return (
-      <div className="p-6">
-        <button
-          onClick={() => signIn()}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Sign in with Google
-        </button>
+      <div className="h-screen flex items-center justify-center text-gray-700 dark:text-white">
+        Loading dashboard...
       </div>
     );
-  }*/}
+  }
 
   return (
     <div className="flex h-screen overflow-hidden relative">
@@ -105,4 +94,23 @@ export default function DashboardPage() {
       />
     </div>
   );
+
+  // ✅ Event Handlers
+  function handleCreate() {
+    setEditingId(null);
+    setSelectedDate(null);
+    setOpen(true);
+  }
+
+  function handleEdit(eventId: string) {
+    setEditingId(eventId);
+    setSelectedDate(null);
+    setOpen(true);
+  }
+
+  function handleDateClick(dateStr: string) {
+    setEditingId(null);
+    setSelectedDate(dateStr);
+    setOpen(true);
+  }
 }
