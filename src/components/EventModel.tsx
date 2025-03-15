@@ -68,7 +68,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-5 z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-50">
       <div className="bg-white p-6 rounded-xl w-96 shadow-lg">
         <h2 className="text-2xl font-semibold mb-4">{editingId ? "Edit Event" : "Create Event"}</h2>
         <form onSubmit={handleSubmit}>
