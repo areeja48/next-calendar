@@ -40,7 +40,7 @@ const CalendarWrapper = ({ events, onEventClick, onDateClick }: CalendarWrapperP
       headerToolbar={{
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
+        right: 'dayGridMonth,listMonth',
       }}
       height="auto"
     />
