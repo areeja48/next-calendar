@@ -64,7 +64,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Set time format
-        defaultDate: startTime, // Set initial start time
+        defaultDate: startTime || undefined, // Set initial start time, use undefined if startTime is empty
         onChange: (selectedDates) => {
           setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Update state when time is picked
         },
@@ -82,7 +82,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Set time format
-        defaultDate: endTime, // Set initial end time
+        defaultDate: endTime || undefined, // Set initial end time, use undefined if endTime is empty
         onChange: (selectedDates) => {
           setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Update state when time is picked
         },
