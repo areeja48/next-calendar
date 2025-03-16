@@ -109,9 +109,9 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
             <input
               id="date"
               ref={dateInputRef} // Reference flatpickr here
-              type="text" // Change type to text so flatpickr can work
+              type="text" // Keep type as text to use flatpickr
               value={date}
-              readOnly // Prevent manual typing
+              onChange={(e) => setDate(e.target.value)} // Allow value update
               required
               className="w-full p-2 border rounded-md"
             />
