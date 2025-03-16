@@ -38,8 +38,8 @@ const CalendarWrapper = ({ events, onEventClick, onDateClick }: CalendarWrapperP
       eventClick={(info: EventClickArg) => onEventClick(info.event.id)}
       dateClick={(info: DateClickArg) => onDateClick(info.dateStr)}
       headerToolbar={{
-        left: 'prev,next today',
-        center: 'title',
+        left: 'today',
+        center: 'prev,title,next',
         right: 'dayGridMonth,listMonth',
       }}
       height="auto"
