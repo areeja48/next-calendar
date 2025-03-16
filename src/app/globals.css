@@ -1,4 +1,6 @@
 
+/* In your global styles (e.g., globals.css) */
+@import "flatpickr/dist/flatpickr.css";
 
 :root {
   --background: #ffffff;
@@ -76,4 +78,30 @@ body {
 .dark .react-calendar__tile--active {
   background-color: #60a5fa !important;
   color: white !important;
+}
+
+/* Add this to your global CSS to target flatpickr styles specifically */
+.flatpickr-calendar {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.flatpickr-calendar .flatpickr-day {
+  transition: background-color 0.2s ease;
+}
+
+.flatpickr-calendar .flatpickr-day:hover {
+  background-color: rgba(66, 133, 244, 0.1);
+  color: var(--foreground);
+}
+
+.flatpickr-calendar .flatpickr-day.selected {
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 999px;
+}
+
+.flatpickr-calendar .flatpickr-day.today {
+  font-weight: 600;
+  color: #3b82f6;
 }
