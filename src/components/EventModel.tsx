@@ -15,6 +15,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);
+  const [isAllDay, setIsAllDay] = useState(false); // State to track if the event is all-day
 
   const dateInputRef = useRef<HTMLInputElement | null>(null); // Reference for the date input
   const startTimeRef = useRef<HTMLInputElement | null>(null); // Reference for the start time input
@@ -40,6 +41,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         setDate(data.date);
         setStartTime(data.startTime || "00:00"); // Default to 00:00 if not provided
         setEndTime(data.endTime || "00:00"); // Default to 00:00 if not provided
+        setIsAllDay(data.isAllDay || false); // Set the all-day event flag
       };
       fetchEventDetails();
     } else {
@@ -47,6 +49,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
       setDate(selectedDate || "");
       setStartTime(null); // Or "00:00" as default
       setEndTime(null); // Or "00:00" as default
+      setIsAllDay(false); // Default to false (not all day)
     }
   }, [editingId, selectedDate]);
 
@@ -66,7 +69,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
   }, [date]);
 
   useEffect(() => {
-    if (startTimeRef.current) {
+    if (startTimeRef.current && !isAllDay) {
       const fpStartTime = flatpickr(startTimeRef.current, {
         enableTime: true,
         noCalendar: true,
@@ -77,13 +80,13 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         minTime: getMinMaxTime(date).minTime, // Use the custom minTime
         maxTime: getMinMaxTime(date).maxTime, // Use the custom maxTime
       });
-  
+
       return () => fpStartTime.destroy();
     }
-  }, [startTime, date]);
-  
+  }, [startTime, date, isAllDay]);
+
   useEffect(() => {
-    if (endTimeRef.current) {
+    if (endTimeRef.current && !isAllDay) {
       const fpEndTime = flatpickr(endTimeRef.current, {
         enableTime: true,
         noCalendar: true,
@@ -94,16 +97,15 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         minTime: getMinMaxTime(date).minTime, // Use the custom minTime
         maxTime: getMinMaxTime(date).maxTime, // Use the custom maxTime
       });
-  
+
       return () => fpEndTime.destroy();
     }
-  }, [endTime, date]);
-  
+  }, [endTime, date, isAllDay]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const eventData = { title, date, startTime, endTime };
+    const eventData = { title, date, startTime, endTime, isAllDay };
 
     if (editingId) {
       await fetch(`/api/events/${editingId}`, {
@@ -162,28 +164,49 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               className="w-full p-2 border rounded-md"
             />
           </div>
+
+          {/* Toggle Button for All Day Event */}
           <div className="mb-4">
-            <label htmlFor="startTime" className="block text-sm font-medium">Start Time</label>
-            <input
-              id="startTime"
-              ref={startTimeRef}
-              type="text"
-              value={startTime || ""} // Ensure it shows nothing if null
-              required
-              className="w-full p-2 border rounded-md"
-            />
+            <label htmlFor="isAllDay" className="inline-flex items-center">
+              <input
+                id="isAllDay"
+                type="checkbox"
+                checked={isAllDay}
+                onChange={() => setIsAllDay(!isAllDay)} // Toggle the all-day event flag
+                className="form-checkbox"
+              />
+              <span className="ml-2 text-sm">All Day Event</span>
+            </label>
           </div>
-          <div className="mb-4">
-            <label htmlFor="endTime" className="block text-sm font-medium">End Time</label>
-            <input
-              id="endTime"
-              ref={endTimeRef}
-              type="text"
-              value={endTime || ""} // Ensure it shows nothing if null
-              required
-              className="w-full p-2 border rounded-md"
-            />
-          </div>
+
+          {/* Conditionally Render Time Fields if Not All Day */}
+          {!isAllDay && (
+            <>
+              <div className="mb-4">
+                <label htmlFor="startTime" className="block text-sm font-medium">Start Time</label>
+                <input
+                  id="startTime"
+                  ref={startTimeRef}
+                  type="text"
+                  value={startTime || ""} // Ensure it shows nothing if null
+                  required
+                  className="w-full p-2 border rounded-md"
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="endTime" className="block text-sm font-medium">End Time</label>
+                <input
+                  id="endTime"
+                  ref={endTimeRef}
+                  type="text"
+                  value={endTime || ""} // Ensure it shows nothing if null
+                  required
+                  className="w-full p-2 border rounded-md"
+                />
+              </div>
+            </>
+          )}
+
           <div className="flex justify-between">
             <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded-md">Cancel</button>
             <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md">
