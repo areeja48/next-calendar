@@ -59,7 +59,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: startTime,
+        defaultDate: startTime ? startTime : "", // Handle null by using empty string
         minuteIncrement: 1,
         onChange: (selectedDates) => {
           setStartTime(selectedDates[0].toISOString()); // Store time as ISO string
@@ -74,7 +74,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: endTime,
+        defaultDate: endTime ? endTime : "", // Handle null by using empty string
         minuteIncrement: 1,
         onChange: (selectedDates) => {
           setEndTime(selectedDates[0].toISOString()); // Store time as ISO string
