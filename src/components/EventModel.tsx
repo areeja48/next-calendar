@@ -1,7 +1,5 @@
-'use client';
-
 import { useState, useEffect, useRef } from "react";
-import flatpickr from "flatpickr"; // Import flatpickr
+import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.css"; // Import flatpickr styles
 
 interface EventModalProps {
@@ -22,6 +20,17 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
   const startTimeRef = useRef<HTMLInputElement | null>(null); // Reference for the start time input
   const endTimeRef = useRef<HTMLInputElement | null>(null); // Reference for the end time input
 
+  // Handle Min/Max Time for specific dates
+  const getMinMaxTime = (date: string) => {
+    const minMaxTimes = {
+      "2025-01-10": { minTime: "16:00", maxTime: "22:00" },
+      // Add more date-specific min/max time pairs here
+    };
+
+    return minMaxTimes[date] || { minTime: "00:00", maxTime: "23:59" };
+  };
+
+  // Fetch event details if editing an event
   useEffect(() => {
     if (editingId) {
       const fetchEventDetails = async () => {
@@ -29,18 +38,19 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         const data = await res.json();
         setTitle(data.title);
         setDate(data.date);
-        setStartTime(data.startTime || null); // If no start time, set to null
-        setEndTime(data.endTime || null); // If no end time, set to null
+        setStartTime(data.startTime || "00:00"); // Default to 00:00 if not provided
+        setEndTime(data.endTime || "00:00"); // Default to 00:00 if not provided
       };
       fetchEventDetails();
     } else {
       setTitle("");
       setDate(selectedDate || "");
-      setStartTime(null); // Default to null
-      setEndTime(null); // Default to null
+      setStartTime(null); // Or "00:00" as default
+      setEndTime(null); // Or "00:00" as default
     }
   }, [editingId, selectedDate]);
 
+  // Initialize date picker for the date field (not the time fields)
   useEffect(() => {
     if (dateInputRef.current) {
       const fp = flatpickr(dateInputRef.current, {
@@ -62,15 +72,17 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: startTime ? `2023-01-01T${startTime}:00` : undefined, // No default time
+        defaultDate: startTime ? `2023-01-01T${startTime}:00` : undefined, // Format date to handle time properly
         onChange: (selectedDates) => {
-          setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Set time in HH:mm format
+          setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
         },
+        minTime: getMinMaxTime(date).minTime, // Use the custom minTime
+        maxTime: getMinMaxTime(date).maxTime, // Use the custom maxTime
       });
 
       return () => fpStartTime.destroy();
     }
-  }, [startTime]);
+  }, [startTime, date]);
 
   // Initialize end time picker for the endTime field
   useEffect(() => {
@@ -79,15 +91,17 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: endTime ? `2023-01-01T${endTime}:00` : undefined, // No default time
+        defaultDate: endTime ? `2023-01-01T${endTime}:00` : undefined, // Format date to handle time properly
         onChange: (selectedDates) => {
-          setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Set time in HH:mm format
+          setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
         },
+        minTime: getMinMaxTime(date).minTime, // Use the custom minTime
+        maxTime: getMinMaxTime(date).maxTime, // Use the custom maxTime
       });
 
       return () => fpEndTime.destroy();
     }
-  }, [endTime]);
+  }, [endTime, date]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -157,7 +171,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               id="startTime"
               ref={startTimeRef}
               type="text"
-              value={startTime || ""} // Empty if null
+              value={startTime || ""} // Ensure it shows nothing if null
               required
               className="w-full p-2 border rounded-md"
             />
@@ -168,7 +182,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               id="endTime"
               ref={endTimeRef}
               type="text"
-              value={endTime || ""} // Empty if null
+              value={endTime || ""} // Ensure it shows nothing if null
               required
               className="w-full p-2 border rounded-md"
             />
