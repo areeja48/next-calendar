@@ -61,10 +61,11 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
     // Initialize flatpickr for the start time input (calendar + time picker)
     if (startTimeRef.current) {
       const fpStartTime = flatpickr(startTimeRef.current, {
-        enableTime: true,      // Enable time picker
-        noCalendar: false,     // Allow calendar to be shown
-        dateFormat: "Y-m-d H:i", // Show date and time
+        enableTime: true, // Enable time picker
+        noCalendar: false, // Allow calendar to show up
+        dateFormat: "Y-m-d H:i", // Show both date and time in the format
         defaultDate: startTime || undefined, // Set initial start time
+        minuteIncrement: 1, // Set minute increments to 1
         onChange: (selectedDates) => {
           setStartTime(selectedDates[0].toISOString()); // Update state with the full date and time
         },
@@ -79,10 +80,11 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
     // Initialize flatpickr for the end time input (calendar + time picker)
     if (endTimeRef.current) {
       const fpEndTime = flatpickr(endTimeRef.current, {
-        enableTime: true,      // Enable time picker
-        noCalendar: false,     // Allow calendar to be shown
-        dateFormat: "Y-m-d H:i", // Show date and time
+        enableTime: true, // Enable time picker
+        noCalendar: false, // Allow calendar to show up
+        dateFormat: "Y-m-d H:i", // Show both date and time in the format
         defaultDate: endTime || undefined, // Set initial end time
+        minuteIncrement: 1, // Set minute increments to 1
         onChange: (selectedDates) => {
           setEndTime(selectedDates[0].toISOString()); // Update state with the full date and time
         },
