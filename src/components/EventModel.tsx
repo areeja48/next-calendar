@@ -61,7 +61,8 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: startTime || "00:00", // Provide a fallback default
+        // Do not use defaultDate if startTime is null
+        defaultDate: startTime ? startTime : undefined,
         onChange: (selectedDates) => {
           setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
         },
@@ -77,7 +78,8 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: endTime || "00:00", // Provide a fallback default
+        // Do not use defaultDate if endTime is null
+        defaultDate: endTime ? endTime : undefined,
         onChange: (selectedDates) => {
           setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
         },
@@ -153,7 +155,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               id="startTime"
               ref={startTimeRef}
               type="text"
-              value={startTime || "00:00"} // Default to "00:00" if empty
+              value={startTime || ""} // Ensure it shows nothing if null
               required
               className="w-full p-2 border rounded-md"
             />
@@ -164,7 +166,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               id="endTime"
               ref={endTimeRef}
               type="text"
-              value={endTime || "00:00"} // Default to "00:00" if empty
+              value={endTime || ""} // Ensure it shows nothing if null
               required
               className="w-full p-2 border rounded-md"
             />
