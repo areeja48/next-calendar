@@ -18,9 +18,9 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
   const [startTime, setStartTime] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);
 
-  const dateInputRef = useRef<HTMLInputElement | null>(null);
-  const startTimeRef = useRef<HTMLInputElement | null>(null);
-  const endTimeRef = useRef<HTMLInputElement | null>(null);
+  const dateInputRef = useRef<HTMLInputElement | null>(null); // Reference for the date input
+  const startTimeRef = useRef<HTMLInputElement | null>(null); // Reference for the start time input
+  const endTimeRef = useRef<HTMLInputElement | null>(null); // Reference for the end time input
 
   useEffect(() => {
     if (editingId) {
@@ -43,43 +43,47 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
 
   useEffect(() => {
     if (dateInputRef.current) {
-      flatpickr(dateInputRef.current, {
+      const fp = flatpickr(dateInputRef.current, {
         dateFormat: "Y-m-d",
         defaultDate: date,
         onChange: (selectedDates) => {
           setDate(selectedDates[0].toISOString().split("T")[0]);
         },
       });
+
+      return () => fp.destroy();
     }
   }, [date]);
 
   useEffect(() => {
     if (startTimeRef.current) {
-      flatpickr(startTimeRef.current, {
+      const fpStartTime = flatpickr(startTimeRef.current, {
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: startTime ? startTime : "", // Handle null by using empty string
-        minuteIncrement: 1,
+        defaultDate: startTime || undefined, // Use the stored startTime value
         onChange: (selectedDates) => {
-          setStartTime(selectedDates[0].toISOString()); // Store time as ISO string
+          setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time
         },
       });
+
+      return () => fpStartTime.destroy();
     }
   }, [startTime]);
 
   useEffect(() => {
     if (endTimeRef.current) {
-      flatpickr(endTimeRef.current, {
+      const fpEndTime = flatpickr(endTimeRef.current, {
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: endTime ? endTime : "", // Handle null by using empty string
-        minuteIncrement: 1,
+        defaultDate: endTime || undefined, // Use the stored endTime value
         onChange: (selectedDates) => {
-          setEndTime(selectedDates[0].toISOString()); // Store time as ISO string
+          setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time
         },
       });
+
+      return () => fpEndTime.destroy();
     }
   }, [endTime]);
 
@@ -149,7 +153,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               id="startTime"
               ref={startTimeRef}
               type="text"
-              value={startTime ? startTime.split("T")[1].slice(0, 5) : ""} // Format time as HH:mm
+              value={startTime || ""}
               required
               className="w-full p-2 border rounded-md"
             />
@@ -160,7 +164,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               id="endTime"
               ref={endTimeRef}
               type="text"
-              value={endTime ? endTime.split("T")[1].slice(0, 5) : ""} // Format time as HH:mm
+              value={endTime || ""}
               required
               className="w-full p-2 border rounded-md"
             />
