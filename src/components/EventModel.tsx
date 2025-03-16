@@ -15,12 +15,12 @@ interface EventModalProps {
 const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: EventModalProps) => {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
-  const [startTime, setStartTime] = useState<string | null>(null); // Start time with nullable string
-  const [endTime, setEndTime] = useState<string | null>(null); // End time with nullable string
+  const [startTime, setStartTime] = useState<string | null>(null);
+  const [endTime, setEndTime] = useState<string | null>(null);
 
-  const dateInputRef = useRef<HTMLInputElement | null>(null); // Reference for the date input
-  const startTimeRef = useRef<HTMLInputElement | null>(null); // Reference for the start time input
-  const endTimeRef = useRef<HTMLInputElement | null>(null); // Reference for the end time input
+  const dateInputRef = useRef<HTMLInputElement | null>(null);
+  const startTimeRef = useRef<HTMLInputElement | null>(null);
+  const endTimeRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (editingId) {
@@ -29,25 +29,25 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         const data = await res.json();
         setTitle(data.title);
         setDate(data.date);
-        setStartTime(data.startTime || null); // Ensure null if no start time
-        setEndTime(data.endTime || null); // Ensure null if no end time
+        setStartTime(data.startTime || null);
+        setEndTime(data.endTime || null);
       };
       fetchEventDetails();
     } else {
       setTitle("");
       setDate(selectedDate || "");
-      setStartTime(null); // Reset start time when creating a new event
-      setEndTime(null); // Reset end time when creating a new event
+      setStartTime(null);
+      setEndTime(null);
     }
   }, [editingId, selectedDate]);
 
   useEffect(() => {
     if (dateInputRef.current) {
       const fp = flatpickr(dateInputRef.current, {
-        dateFormat: "Y-m-d", // Set the date format
-        defaultDate: date, // Set the initial date value
+        dateFormat: "Y-m-d",
+        defaultDate: date,
         onChange: (selectedDates) => {
-          setDate(selectedDates[0].toISOString().split("T")[0]); // Update state with selected date
+          setDate(selectedDates[0].toISOString().split("T")[0]); // Update date
         },
       });
 
@@ -59,12 +59,12 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
     if (startTimeRef.current) {
       const fpStartTime = flatpickr(startTimeRef.current, {
         enableTime: true,
-        noCalendar: false, // Show calendar along with time
-        dateFormat: "Y-m-d H:i", // Set format to include date and time
-        defaultDate: startTime ? startTime : undefined, // Set initial value if present
+        noCalendar: true, // Don't show the calendar, just the time
+        dateFormat: "Y-m-d H:i", // Date format with time
+        defaultDate: startTime ? startTime : undefined, // Initialize with current or undefined
         minuteIncrement: 1,
         onChange: (selectedDates) => {
-          setStartTime(selectedDates[0].toISOString()); // Update state with ISO string
+          setStartTime(selectedDates[0].toISOString()); // Store as ISO string
         },
       });
 
@@ -76,12 +76,12 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
     if (endTimeRef.current) {
       const fpEndTime = flatpickr(endTimeRef.current, {
         enableTime: true,
-        noCalendar: false, // Show calendar along with time
-        dateFormat: "Y-m-d H:i", // Set format to include date and time
-        defaultDate: endTime ? endTime : undefined, // Set initial value if present
+        noCalendar: true, // Don't show the calendar, just the time
+        dateFormat: "Y-m-d H:i", // Date format with time
+        defaultDate: endTime ? endTime : undefined, // Initialize with current or undefined
         minuteIncrement: 1,
         onChange: (selectedDates) => {
-          setEndTime(selectedDates[0].toISOString()); // Update state with ISO string
+          setEndTime(selectedDates[0].toISOString()); // Store as ISO string
         },
       });
 
@@ -141,10 +141,10 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
             <label htmlFor="date" className="block text-sm font-medium">Date</label>
             <input
               id="date"
-              ref={dateInputRef} // Reference flatpickr here
-              type="text" // Keep type as text to use flatpickr
+              ref={dateInputRef} // Reference for flatpickr
+              type="text"
               value={date}
-              onChange={(e) => setDate(e.target.value)} // Allow value update
+              onChange={(e) => setDate(e.target.value)}
               required
               className="w-full p-2 border rounded-md"
             />
@@ -153,9 +153,9 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
             <label htmlFor="startTime" className="block text-sm font-medium">Start Time</label>
             <input
               id="startTime"
-              ref={startTimeRef} // Reference flatpickr for start time
-              type="text" // Change type to text for flatpickr to work
-              value={startTime ? startTime.split("T")[1].slice(0, 5) : ""} // Only show time portion
+              ref={startTimeRef} // Reference for flatpickr for start time
+              type="text"
+              value={startTime ? startTime.split("T")[1].slice(0, 5) : ""} // Display only time portion
               required
               className="w-full p-2 border rounded-md"
             />
@@ -164,9 +164,9 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
             <label htmlFor="endTime" className="block text-sm font-medium">End Time</label>
             <input
               id="endTime"
-              ref={endTimeRef} // Reference flatpickr for end time
-              type="text" // Change type to text for flatpickr to work
-              value={endTime ? endTime.split("T")[1].slice(0, 5) : ""} // Only show time portion
+              ref={endTimeRef} // Reference for flatpickr for end time
+              type="text"
+              value={endTime ? endTime.split("T")[1].slice(0, 5) : ""} // Display only time portion
               required
               className="w-full p-2 border rounded-md"
             />
