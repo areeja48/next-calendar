@@ -43,49 +43,43 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
 
   useEffect(() => {
     if (dateInputRef.current) {
-      const fp = flatpickr(dateInputRef.current, {
+      flatpickr(dateInputRef.current, {
         dateFormat: "Y-m-d",
         defaultDate: date,
         onChange: (selectedDates) => {
-          setDate(selectedDates[0].toISOString().split("T")[0]); // Update date
+          setDate(selectedDates[0].toISOString().split("T")[0]);
         },
       });
-
-      return () => fp.destroy();
     }
   }, [date]);
 
   useEffect(() => {
     if (startTimeRef.current) {
-      const fpStartTime = flatpickr(startTimeRef.current, {
+      flatpickr(startTimeRef.current, {
         enableTime: true,
-        noCalendar: true, // Don't show the calendar, just the time
-        dateFormat: "Y-m-d H:i", // Date format with time
-        defaultDate: startTime ? startTime : undefined, // Initialize with current or undefined
+        noCalendar: true,
+        dateFormat: "H:i", // Only time (HH:mm)
+        defaultDate: startTime,
         minuteIncrement: 1,
         onChange: (selectedDates) => {
-          setStartTime(selectedDates[0].toISOString()); // Store as ISO string
+          setStartTime(selectedDates[0].toISOString()); // Store time as ISO string
         },
       });
-
-      return () => fpStartTime.destroy();
     }
   }, [startTime]);
 
   useEffect(() => {
     if (endTimeRef.current) {
-      const fpEndTime = flatpickr(endTimeRef.current, {
+      flatpickr(endTimeRef.current, {
         enableTime: true,
-        noCalendar: true, // Don't show the calendar, just the time
-        dateFormat: "Y-m-d H:i", // Date format with time
-        defaultDate: endTime ? endTime : undefined, // Initialize with current or undefined
+        noCalendar: true,
+        dateFormat: "H:i", // Only time (HH:mm)
+        defaultDate: endTime,
         minuteIncrement: 1,
         onChange: (selectedDates) => {
-          setEndTime(selectedDates[0].toISOString()); // Store as ISO string
+          setEndTime(selectedDates[0].toISOString()); // Store time as ISO string
         },
       });
-
-      return () => fpEndTime.destroy();
     }
   }, [endTime]);
 
@@ -141,7 +135,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
             <label htmlFor="date" className="block text-sm font-medium">Date</label>
             <input
               id="date"
-              ref={dateInputRef} // Reference for flatpickr
+              ref={dateInputRef}
               type="text"
               value={date}
               onChange={(e) => setDate(e.target.value)}
@@ -153,9 +147,9 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
             <label htmlFor="startTime" className="block text-sm font-medium">Start Time</label>
             <input
               id="startTime"
-              ref={startTimeRef} // Reference for flatpickr for start time
+              ref={startTimeRef}
               type="text"
-              value={startTime ? startTime.split("T")[1].slice(0, 5) : ""} // Display only time portion
+              value={startTime ? startTime.split("T")[1].slice(0, 5) : ""} // Format time as HH:mm
               required
               className="w-full p-2 border rounded-md"
             />
@@ -164,9 +158,9 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
             <label htmlFor="endTime" className="block text-sm font-medium">End Time</label>
             <input
               id="endTime"
-              ref={endTimeRef} // Reference for flatpickr for end time
+              ref={endTimeRef}
               type="text"
-              value={endTime ? endTime.split("T")[1].slice(0, 5) : ""} // Display only time portion
+              value={endTime ? endTime.split("T")[1].slice(0, 5) : ""} // Format time as HH:mm
               required
               className="w-full p-2 border rounded-md"
             />
