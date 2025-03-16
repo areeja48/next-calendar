@@ -22,7 +22,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
 
   // Handle Min/Max Time for specific dates
   const getMinMaxTime = (date: string) => {
-    const minMaxTimes = {
+    const minMaxTimes: { [key: string]: { minTime: string; maxTime: string } } = {
       "2025-01-10": { minTime: "16:00", maxTime: "22:00" },
       // Add more date-specific min/max time pairs here
     };
