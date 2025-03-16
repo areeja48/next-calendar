@@ -33,6 +33,12 @@ body {
   background-color: var(--background);
   font-family: var(--font-sans);
 }
+.fc-toolbar-title {
+  font-size: 18px; /* Adjust the font size */
+  text-align: center; /* Ensures the title stays centered */
+  margin-left: auto;
+  margin-right: auto;
+}
 
 /* React Calendar Custom Styles */
 .react-calendar {

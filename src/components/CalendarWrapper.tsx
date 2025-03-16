@@ -7,6 +7,7 @@ import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction'; // For date click
 import { EventClickArg } from '@fullcalendar/core';
 import { DateClickArg } from '@fullcalendar/interaction';
+import '../app/globals.css';
 
 interface EventData {
   _id: string;
@@ -38,9 +39,9 @@ const CalendarWrapper = ({ events, onEventClick, onDateClick }: CalendarWrapperP
       eventClick={(info: EventClickArg) => onEventClick(info.event.id)}
       dateClick={(info: DateClickArg) => onDateClick(info.dateStr)}
       headerToolbar={{
-        left: 'today',
-        center: 'prev,title,next',
-        right: 'dayGridMonth,listMonth',
+        left: 'prev,next',  // Adjust left buttons to prev and next only
+        center: 'title',    // Title will be centered
+        right: 'dayGridMonth,listMonth', // Right side buttons for view change
       }}
       height="auto"
     />
