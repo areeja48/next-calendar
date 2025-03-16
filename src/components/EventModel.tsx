@@ -71,7 +71,6 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: startTime ? `2023-01-01T${startTime}:00` : undefined, // Set default only if startTime exists
         onChange: (selectedDates) => {
           setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
         },
@@ -89,7 +88,6 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: endTime ? `2023-01-01T${endTime}:00` : undefined, // Set default only if endTime exists
         onChange: (selectedDates) => {
           setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
         },
