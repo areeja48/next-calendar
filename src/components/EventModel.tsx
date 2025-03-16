@@ -65,43 +65,42 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
     }
   }, [date]);
 
-  // Initialize start time picker for the startTime field
   useEffect(() => {
     if (startTimeRef.current) {
       const fpStartTime = flatpickr(startTimeRef.current, {
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: startTime ? `2023-01-01T${startTime}:00` : undefined, // Format date to handle time properly
+        defaultDate: startTime ? `2023-01-01T${startTime}:00` : undefined, // Only set default if startTime exists
         onChange: (selectedDates) => {
           setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
         },
         minTime: getMinMaxTime(date).minTime, // Use the custom minTime
         maxTime: getMinMaxTime(date).maxTime, // Use the custom maxTime
       });
-
+  
       return () => fpStartTime.destroy();
     }
   }, [startTime, date]);
-
-  // Initialize end time picker for the endTime field
+  
   useEffect(() => {
     if (endTimeRef.current) {
       const fpEndTime = flatpickr(endTimeRef.current, {
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: endTime ? `2023-01-01T${endTime}:00` : undefined, // Format date to handle time properly
+        defaultDate: endTime ? `2023-01-01T${endTime}:00` : undefined, // Only set default if endTime exists
         onChange: (selectedDates) => {
           setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
         },
         minTime: getMinMaxTime(date).minTime, // Use the custom minTime
         maxTime: getMinMaxTime(date).maxTime, // Use the custom maxTime
       });
-
+  
       return () => fpEndTime.destroy();
     }
   }, [endTime, date]);
+  
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
