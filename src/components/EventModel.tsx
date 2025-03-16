@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import flatpickr from "flatpickr"; // Import flatpickr
 
 interface EventModalProps {
   open: boolean;
@@ -15,6 +16,8 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+
+  const dateInputRef = useRef<HTMLInputElement | null>(null); // Create a reference for the date input
 
   useEffect(() => {
     if (editingId) {
@@ -34,6 +37,27 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
       setEndTime("");
     }
   }, [editingId, selectedDate]);
+
+  useEffect(() => {
+    // Initialize flatpickr when the component mounts
+    if (dateInputRef.current) {
+      flatpickr(dateInputRef.current, {
+        dateFormat: "Y-m-d", // Set the date format
+        defaultDate: date,   // Set the initial date value
+        onChange: (selectedDates) => {
+          setDate(selectedDates[0].toISOString().split("T")[0]); // Update state when a date is picked
+        },
+      });
+    }
+
+    // Cleanup flatpickr on unmount
+    return () => {
+      if (dateInputRef.current) {
+        const fp = flatpickr(dateInputRef.current);
+        fp.destroy();
+      }
+    };
+  }, [date]); // Ensure flatpickr is reset if the date changes
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +92,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-transparent-blur bg-opacity-50 z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-transparent bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded-xl w-96 shadow-lg">
         <h2 className="text-2xl font-semibold mb-4">{editingId ? "Edit Event" : "Create Event"}</h2>
         <form onSubmit={handleSubmit}>
@@ -85,11 +109,13 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
           </div>
           <div className="mb-4">
             <label htmlFor="date" className="block text-sm font-medium">Date</label>
+            {/* Use ref to hook flatpickr into this input */}
             <input
               id="date"
-              type="date"
+              ref={dateInputRef} // Reference flatpickr here
+              type="text" // Change type to text so flatpickr can work
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              readOnly // Prevent manual typing
               required
               className="w-full p-2 border rounded-md"
             />
