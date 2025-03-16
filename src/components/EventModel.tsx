@@ -63,7 +63,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         dateFormat: "H:i", // Only time (HH:mm)
         defaultDate: startTime || undefined, // Use the stored startTime value
         onChange: (selectedDates) => {
-          setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time
+          setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
         },
       });
 
@@ -79,7 +79,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         dateFormat: "H:i", // Only time (HH:mm)
         defaultDate: endTime || undefined, // Use the stored endTime value
         onChange: (selectedDates) => {
-          setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time
+          setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
         },
       });
 
