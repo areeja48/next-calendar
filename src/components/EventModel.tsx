@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import flatpickr from "flatpickr"; // Import flatpickr
+import "flatpickr/dist/flatpickr.css"; // Import flatpickr styles
 
 interface EventModalProps {
   open: boolean;
@@ -41,22 +42,17 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
   useEffect(() => {
     // Initialize flatpickr when the component mounts
     if (dateInputRef.current) {
-      flatpickr(dateInputRef.current, {
+      const fp = flatpickr(dateInputRef.current, {
         dateFormat: "Y-m-d", // Set the date format
         defaultDate: date,   // Set the initial date value
         onChange: (selectedDates) => {
           setDate(selectedDates[0].toISOString().split("T")[0]); // Update state when a date is picked
         },
       });
-    }
 
-    // Cleanup flatpickr on unmount
-    return () => {
-      if (dateInputRef.current) {
-        const fp = flatpickr(dateInputRef.current);
-        fp.destroy();
-      }
-    };
+      // Cleanup flatpickr on unmount
+      return () => fp.destroy();
+    }
   }, [date]); // Ensure flatpickr is reset if the date changes
 
   const handleSubmit = async (e: React.FormEvent) => {
