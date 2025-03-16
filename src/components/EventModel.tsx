@@ -62,8 +62,6 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
     if (startTimeRef.current) {
       const fpStartTime = flatpickr(startTimeRef.current, {
         enableTime: true, // Enable time picker
-        noCalendar: false, // Allow calendar to show up
-        dateFormat: "Y-m-d H:i", // Show both date and time in the format
         defaultDate: startTime || undefined, // Set initial start time
         minuteIncrement: 1, // Set minute increments to 1
         onChange: (selectedDates) => {
@@ -81,8 +79,6 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
     if (endTimeRef.current) {
       const fpEndTime = flatpickr(endTimeRef.current, {
         enableTime: true, // Enable time picker
-        noCalendar: false, // Allow calendar to show up
-        dateFormat: "Y-m-d H:i", // Show both date and time in the format
         defaultDate: endTime || undefined, // Set initial end time
         minuteIncrement: 1, // Set minute increments to 1
         onChange: (selectedDates) => {
