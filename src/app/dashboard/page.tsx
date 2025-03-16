@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import FloatingActionButton from '@/components/FAB';
 import CalendarWrapper from '@/components/CalendarWrapper';
 import EventModel from '@/components/EventModel'; // Make sure it's correctly named
-import "flatpickr/dist/flatpickr.css"; // Import flatpickr styles
+
 
 
 // ✅ Updated event type

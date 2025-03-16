@@ -3,6 +3,7 @@
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import "flatpickr/dist/flatpickr.css"; // Import flatpickr styles
 
 export default function SignInPage() {
   const { status } = useSession()
