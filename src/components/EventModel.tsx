@@ -15,8 +15,8 @@ interface EventModalProps {
 const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: EventModalProps) => {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+  const [startTime, setStartTime] = useState<string | null>(null); // Start time with nullable string
+  const [endTime, setEndTime] = useState<string | null>(null); // End time with nullable string
 
   const dateInputRef = useRef<HTMLInputElement | null>(null); // Reference for the date input
   const startTimeRef = useRef<HTMLInputElement | null>(null); // Reference for the start time input
@@ -29,67 +29,65 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         const data = await res.json();
         setTitle(data.title);
         setDate(data.date);
-        setStartTime(data.startTime || "");
-        setEndTime(data.endTime || "");
+        setStartTime(data.startTime || null); // Ensure null if no start time
+        setEndTime(data.endTime || null); // Ensure null if no end time
       };
       fetchEventDetails();
     } else {
       setTitle("");
       setDate(selectedDate || "");
-      setStartTime("");
-      setEndTime("");
+      setStartTime(null); // Reset start time when creating a new event
+      setEndTime(null); // Reset end time when creating a new event
     }
   }, [editingId, selectedDate]);
 
   useEffect(() => {
-    // Initialize flatpickr for the date input (calendar)
     if (dateInputRef.current) {
       const fp = flatpickr(dateInputRef.current, {
         dateFormat: "Y-m-d", // Set the date format
-        defaultDate: date,   // Set the initial date value
+        defaultDate: date, // Set the initial date value
         onChange: (selectedDates) => {
-          setDate(selectedDates[0].toISOString().split("T")[0]); // Update state when a date is picked
+          setDate(selectedDates[0].toISOString().split("T")[0]); // Update state with selected date
         },
       });
 
-      // Cleanup flatpickr on unmount
       return () => fp.destroy();
     }
-  }, [date]); // Ensure flatpickr is reset if the date changes
+  }, [date]);
 
   useEffect(() => {
-    // Initialize flatpickr for the start time input (calendar + time picker)
     if (startTimeRef.current) {
       const fpStartTime = flatpickr(startTimeRef.current, {
-        enableTime: true, // Enable time picker
-        defaultDate: startTime || undefined, // Set initial start time
-        minuteIncrement: 1, // Set minute increments to 1
+        enableTime: true,
+        noCalendar: false, // Show calendar along with time
+        dateFormat: "Y-m-d H:i", // Set format to include date and time
+        defaultDate: startTime ? startTime : undefined, // Set initial value if present
+        minuteIncrement: 1,
         onChange: (selectedDates) => {
-          setStartTime(selectedDates[0].toISOString()); // Update state with the full date and time
+          setStartTime(selectedDates[0].toISOString()); // Update state with ISO string
         },
       });
 
-      // Cleanup flatpickr on unmount
       return () => fpStartTime.destroy();
     }
-  }, [startTime]); // Ensure flatpickr for start time is reset
+  }, [startTime]);
 
   useEffect(() => {
-    // Initialize flatpickr for the end time input (calendar + time picker)
     if (endTimeRef.current) {
       const fpEndTime = flatpickr(endTimeRef.current, {
-        enableTime: true, // Enable time picker
-        defaultDate: endTime || undefined, // Set initial end time
-        minuteIncrement: 1, // Set minute increments to 1
+        enableTime: true,
+        noCalendar: false, // Show calendar along with time
+        dateFormat: "Y-m-d H:i", // Set format to include date and time
+        defaultDate: endTime ? endTime : undefined, // Set initial value if present
+        minuteIncrement: 1,
         onChange: (selectedDates) => {
-          setEndTime(selectedDates[0].toISOString()); // Update state with the full date and time
+          setEndTime(selectedDates[0].toISOString()); // Update state with ISO string
         },
       });
 
-      // Cleanup flatpickr on unmount
       return () => fpEndTime.destroy();
     }
-  }, [endTime]); // Ensure flatpickr for end time is reset
+  }, [endTime]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,7 +155,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               id="startTime"
               ref={startTimeRef} // Reference flatpickr for start time
               type="text" // Change type to text for flatpickr to work
-              value={startTime}
+              value={startTime ? startTime.split("T")[1].slice(0, 5) : ""} // Only show time portion
               required
               className="w-full p-2 border rounded-md"
             />
@@ -168,7 +166,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               id="endTime"
               ref={endTimeRef} // Reference flatpickr for end time
               type="text" // Change type to text for flatpickr to work
-              value={endTime}
+              value={endTime ? endTime.split("T")[1].slice(0, 5) : ""} // Only show time portion
               required
               className="w-full p-2 border rounded-md"
             />
