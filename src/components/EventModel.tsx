@@ -29,15 +29,15 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         const data = await res.json();
         setTitle(data.title);
         setDate(data.date);
-        setStartTime(data.startTime || "00:00"); // Default to 00:00 if not provided
-        setEndTime(data.endTime || "00:00"); // Default to 00:00 if not provided
+        setStartTime(data.startTime || null); // If no start time, set to null
+        setEndTime(data.endTime || null); // If no end time, set to null
       };
       fetchEventDetails();
     } else {
       setTitle("");
       setDate(selectedDate || "");
-      setStartTime(null); // Or "00:00" as default
-      setEndTime(null); // Or "00:00" as default
+      setStartTime(null); // Default to null
+      setEndTime(null); // Default to null
     }
   }, [editingId, selectedDate]);
 
@@ -55,16 +55,16 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
     }
   }, [date]);
 
+  // Initialize start time picker for the startTime field
   useEffect(() => {
     if (startTimeRef.current) {
       const fpStartTime = flatpickr(startTimeRef.current, {
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        // Do not use defaultDate if startTime is null
-        defaultDate: startTime ? startTime : undefined,
+        defaultDate: startTime ? `2023-01-01T${startTime}:00` : undefined, // No default time
         onChange: (selectedDates) => {
-          setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
+          setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Set time in HH:mm format
         },
       });
 
@@ -72,16 +72,16 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
     }
   }, [startTime]);
 
+  // Initialize end time picker for the endTime field
   useEffect(() => {
     if (endTimeRef.current) {
       const fpEndTime = flatpickr(endTimeRef.current, {
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        // Do not use defaultDate if endTime is null
-        defaultDate: endTime ? endTime : undefined,
+        defaultDate: endTime ? `2023-01-01T${endTime}:00` : undefined, // No default time
         onChange: (selectedDates) => {
-          setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
+          setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Set time in HH:mm format
         },
       });
 
@@ -89,6 +89,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
     }
   }, [endTime]);
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const eventData = { title, date, startTime, endTime };
@@ -111,6 +112,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
     fetchEvents();
   };
 
+  // Handle event deletion
   const handleDelete = async () => {
     if (editingId) {
       await fetch(`/api/events/${editingId}`, { method: "DELETE" });
@@ -155,7 +157,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               id="startTime"
               ref={startTimeRef}
               type="text"
-              value={startTime || ""} // Ensure it shows nothing if null
+              value={startTime || ""} // Empty if null
               required
               className="w-full p-2 border rounded-md"
             />
@@ -166,7 +168,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               id="endTime"
               ref={endTimeRef}
               type="text"
-              value={endTime || ""} // Ensure it shows nothing if null
+              value={endTime || ""} // Empty if null
               required
               className="w-full p-2 border rounded-md"
             />
