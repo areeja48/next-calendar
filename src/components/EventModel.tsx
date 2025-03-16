@@ -29,15 +29,15 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         const data = await res.json();
         setTitle(data.title);
         setDate(data.date);
-        setStartTime(data.startTime || null);
-        setEndTime(data.endTime || null);
+        setStartTime(data.startTime || "00:00"); // Default to 00:00 if not provided
+        setEndTime(data.endTime || "00:00"); // Default to 00:00 if not provided
       };
       fetchEventDetails();
     } else {
       setTitle("");
       setDate(selectedDate || "");
-      setStartTime(null);
-      setEndTime(null);
+      setStartTime(null); // Or "00:00" as default
+      setEndTime(null); // Or "00:00" as default
     }
   }, [editingId, selectedDate]);
 
@@ -61,7 +61,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: startTime || undefined, // Use the stored startTime value
+        defaultDate: startTime || "00:00", // Provide a fallback default
         onChange: (selectedDates) => {
           setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
         },
@@ -77,7 +77,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i", // Only time (HH:mm)
-        defaultDate: endTime || undefined, // Use the stored endTime value
+        defaultDate: endTime || "00:00", // Provide a fallback default
         onChange: (selectedDates) => {
           setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
         },
@@ -153,7 +153,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               id="startTime"
               ref={startTimeRef}
               type="text"
-              value={startTime || ""}
+              value={startTime || "00:00"} // Default to "00:00" if empty
               required
               className="w-full p-2 border rounded-md"
             />
@@ -164,7 +164,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               id="endTime"
               ref={endTimeRef}
               type="text"
-              value={endTime || ""}
+              value={endTime || "00:00"} // Default to "00:00" if empty
               required
               className="w-full p-2 border rounded-md"
             />
