@@ -34,24 +34,69 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Adjust the header layout using Flexbox */
+/* Ensure the header toolbar uses flex layout */
 .fc-header-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: relative;
 }
 
-/* Adjust title positioning */
+/* Customize the month-year title */
 .fc-toolbar-title {
-  position: absolute;
-  left: 50%;              /* Center the title horizontally */
-  transform: translateX(-50%); /* Offset it by 50% of its width */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem; /* Adjust font size for better readability */
+  font-weight: bold; /* Optional: Make the title bold */
 }
 
-/* Optional: Adjust the spacing around the prev/next buttons */
+/* Style for prev and next buttons */
 .fc-prev-button, .fc-next-button {
-  flex-shrink: 0; /* Prevent shrinking of prev and next buttons */
+  flex-shrink: 0; /* Prevent shrinking of the prev/next buttons */
+}
+
+/* Add custom arrows for prev and next buttons */
+.fc-prev-button::after, .fc-next-button::after {
+  content: '<<';  /* For the prev button */
+  font-size: 1.5rem; /* Adjust the size of the arrows */
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.fc-next-button::after {
+  content: '>>';  /* For the next button */
+  font-size: 1.5rem;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+/* Ensure that the prev/next buttons align correctly */
+.fc-toolbar-chunk {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Style the view change buttons */
+.fc-button-group {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.fc-button {
+  font-size: 1rem; /* Adjust button size */
+  padding: 5px 10px; /* Adjust padding */
+  margin-left: 5px;  /* Add spacing between the buttons */
+}
+
+/* Optionally, style the view buttons with custom colors or hover effects */
+.fc-dayGridMonth-button, .fc-listMonth-button {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+}
+
+.fc-dayGridMonth-button:hover, .fc-listMonth-button:hover {
+  background-color: #e2e2e2; /* Light hover effect */
 }
 
 

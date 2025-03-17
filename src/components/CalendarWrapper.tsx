@@ -39,9 +39,9 @@ const CalendarWrapper = ({ events, onEventClick, onDateClick }: CalendarWrapperP
       eventClick={(info: EventClickArg) => onEventClick(info.event.id)}
       dateClick={(info: DateClickArg) => onDateClick(info.dateStr)}
       headerToolbar={{
-        left: 'prev,next',  // Adjust left buttons to prev and next only
-        center: 'title',    // Title will be centered
-        right: 'dayGridMonth,listMonth', // Right side buttons for view change
+        left: 'prev',             // 'prev' button on the left
+        center: 'title',          // Month title in the center
+        right: 'next dayGridMonth,listMonth', // 'next' button and view options (month/list)
       }}
       height="auto"
     />
