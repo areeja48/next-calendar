@@ -34,7 +34,7 @@ body {
   font-family: var(--font-sans);
 }
 /* FullCalendar Header - Days' Header */
-.fc-header-toolbar.fc-toolbar.fc-toolbar-ltr{
+div .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr{
   display: flex;
   align-items: center;
   
