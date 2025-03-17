@@ -41,6 +41,9 @@ body {
   background-color: #3b82f6; /* Blue background for the toolbar */
   color: #FFF; /* White text color */
 }
+table .fc-col-header {
+ background-color: #2563eb;
+}
 
 .fc .fc-day-header {
   background-color: #3b82f6; /* Blue background for the day header */
