@@ -44,6 +44,8 @@ body {
 /* Customize the month-year title */
 .fc-toolbar-title {
   display: flex;
+  background-color: #3b82f6;
+  color: #ffffff;
   justify-content: center;
   align-items: center;
   font-size: 1.2rem; /* Adjust font size for better readability */
