@@ -33,23 +33,25 @@ body {
   background-color: var(--background);
   font-family: var(--font-sans);
 }
-/* Ensure the header toolbar uses flex layout */
+
+/* Adjust the header layout using Flexbox */
 .fc-header-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
-/* Target the FullCalendar title and adjust its positioning */
+/* Adjust title positioning */
 .fc-toolbar-title {
-  position: absolute; /* Position it absolutely */
-  left: 50%;          /* Position at the center */
-  transform: translateX(-50%); /* Offset the title to the center */
+  position: absolute;
+  left: 50%;              /* Center the title horizontally */
+  transform: translateX(-50%); /* Offset it by 50% of its width */
 }
 
-/* Optional: Adjust spacing around prev and next buttons */
+/* Optional: Adjust the spacing around the prev/next buttons */
 .fc-prev-button, .fc-next-button {
-  flex-shrink: 0;  /* Prevent the buttons from shrinking */
+  flex-shrink: 0; /* Prevent shrinking of prev and next buttons */
 }
 
 
