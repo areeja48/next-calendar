@@ -55,20 +55,6 @@ body {
   flex-shrink: 0; /* Prevent shrinking of the prev/next buttons */
 }
 
-/* Add custom arrows for prev and next buttons */
-.fc-prev-button::after, .fc-next-button::after {
-  content: '<<';  /* For the prev button */
-  font-size: 1.5rem; /* Adjust the size of the arrows */
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
-.fc-next-button::after {
-  content: '>>';  /* For the next button */
-  font-size: 1.5rem;
-  margin-left: 10px;
-  margin-right: 10px;
-}
 
 /* Ensure that the prev/next buttons align correctly */
 .fc-toolbar-chunk {
