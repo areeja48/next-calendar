@@ -33,25 +33,25 @@ body {
   background-color: var(--background);
   font-family: var(--font-sans);
 }
-/* CalendarWrapper.css */
+/* Ensure the header toolbar uses flex layout */
+.fc-header-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Target the FullCalendar title and adjust its positioning */
 .fc-toolbar-title {
-  font-size: 22px; /* Adjust font size */
-  font-weight: bold; /* Make the title bold */
-  text-align: center; /* Ensure the title is centered */
-  color: #4a4a4a; /* Change the color of the title */
+  position: absolute; /* Position it absolutely */
+  left: 50%;          /* Position at the center */
+  transform: translateX(-50%); /* Offset the title to the center */
 }
 
-.fc-toolbar .fc-prev-button,
-.fc-toolbar .fc-next-button {
-  background-color: transparent; /* Make previous/next buttons transparent */
-  border: none;
-  color: #4a4a4a; /* Change the color of the buttons */
+/* Optional: Adjust spacing around prev and next buttons */
+.fc-prev-button, .fc-next-button {
+  flex-shrink: 0;  /* Prevent the buttons from shrinking */
 }
 
-.fc-toolbar .fc-prev-button:hover,
-.fc-toolbar .fc-next-button:hover {
-  color: #000; /* Darken color on hover */
-}
 
 /* React Calendar Custom Styles */
 .react-calendar {

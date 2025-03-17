@@ -46,6 +46,7 @@ const CalendarWrapper = ({ events, onEventClick, onDateClick }: CalendarWrapperP
       height="auto"
     />
   );
+ 
 };
 
 export default CalendarWrapper;
