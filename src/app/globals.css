@@ -33,11 +33,24 @@ body {
   background-color: var(--background);
   font-family: var(--font-sans);
 }
+/* CalendarWrapper.css */
 .fc-toolbar-title {
-  font-size: 18px; /* Adjust the font size */
-  text-align: center; /* Ensures the title stays centered */
-  margin-left: auto;
-  margin-right: auto;
+  font-size: 22px; /* Adjust font size */
+  font-weight: bold; /* Make the title bold */
+  text-align: center; /* Ensure the title is centered */
+  color: #4a4a4a; /* Change the color of the title */
+}
+
+.fc-toolbar .fc-prev-button,
+.fc-toolbar .fc-next-button {
+  background-color: transparent; /* Make previous/next buttons transparent */
+  border: none;
+  color: #4a4a4a; /* Change the color of the buttons */
+}
+
+.fc-toolbar .fc-prev-button:hover,
+.fc-toolbar .fc-next-button:hover {
+  color: #000; /* Darken color on hover */
 }
 
 /* React Calendar Custom Styles */
