@@ -33,7 +33,14 @@ body {
   background-color: var(--background);
   font-family: var(--font-sans);
 }
-
+.fc .fc-toolbar {
+  align-items: center;
+  display: flex;
+}
+.fc .fc-header {
+  background-color: #3b82f6;
+  color:#FFF;
+}
 
 /* React Calendar Custom Styles */
 .react-calendar {
