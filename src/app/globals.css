@@ -33,13 +33,64 @@ body {
   background-color: var(--background);
   font-family: var(--font-sans);
 }
-.fc .fc-toolbar {
-  align-items: center;
+/* FullCalendar Header - Days' Header */
+.fc .fc-header-toolbar {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #3b82f6; /* Blue background for the toolbar */
+  color: #FFF; /* White text color */
 }
-.fc .fc-header {
+
+.fc .fc-day-header {
+  background-color: #3b82f6; /* Blue background for the day header */
+  color: #FFF; /* White text for day names */
+  font-weight: bold; /* Optional: make the day names bold */
+  text-align: center; /* Ensure text is centered in the header */
+  padding: 10px 0; /* Add padding for a nicer look */
+}
+
+.fc .fc-day-header.fc-other-month {
+  background-color: #e2e2e2; /* Light grey background for other months */
+  color: #999; /* Lighter text color for days from other months */
+}
+
+.fc .fc-day-grid-day {
+  padding: 10px; /* Add padding to the day cells */
+}
+
+.fc .fc-header-toolbar {
   background-color: #3b82f6;
-  color:#FFF;
+  color: white;
+}
+
+.fc .fc-prev-button, .fc .fc-next-button {
+  color: #FFF; /* White color for previous/next buttons */
+  background-color: transparent;
+  border: none;
+  font-size: 1.2rem;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.5rem;  /* Title size */
+  font-weight: bold;
+  color: #FFF;  /* Ensure the title is white */
+}
+
+/* FullCalendar Event Styling */
+.fc .fc-day-grid-event {
+  background-color: #3b82f6; /* Blue background for events */
+  color: #FFF; /* White text */
+  border-radius: 5px; /* Rounded corners for events */
+}
+
+.fc .fc-event:hover {
+  background-color: #2563eb; /* Darker blue when hovered */
+}
+
+/* Additional styling for other FullCalendar components */
+.fc .fc-day-today {
+  border: 2px solid #3b82f6; /* Add a border around today's date */
 }
 
 /* React Calendar Custom Styles */
