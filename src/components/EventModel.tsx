@@ -1,3 +1,4 @@
+// src/components/EventModel.tsx
 import { useState, useEffect, useRef } from "react";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.css"; // Import flatpickr styles
@@ -39,9 +40,21 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
         const data = await res.json();
         setTitle(data.title);
         setDate(data.date);
-        setStartTime(data.startTime || "00:00"); // Default to 00:00 if not provided
-        setEndTime(data.endTime || "00:00"); // Default to 00:00 if not provided
-        setIsAllDay(data.isAllDay || false); // Set the all-day event flag
+        setStartTime(data.startTime || "00:00");
+        setEndTime(data.endTime || "00:00");
+        setIsAllDay(data.isAllDay || false);
+        
+        // Manually update flatpickr input values
+        if (dateInputRef.current) {
+          dateInputRef.current.value = data.date;
+        }
+        if (startTimeRef.current && data.startTime) {
+          startTimeRef.current.value = data.startTime;
+        }
+        if (endTimeRef.current && data.endTime) {
+          endTimeRef.current.value = data.endTime;
+        }
+        
       };
       fetchEventDetails();
     } else {

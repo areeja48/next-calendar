@@ -1,3 +1,4 @@
+// src/components/CalendarWrapper.tsx
 'use client';
 
 import FullCalendar from '@fullcalendar/react';
