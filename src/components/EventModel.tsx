@@ -25,46 +25,46 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
   // Handle Min/Max Time for specific dates
   const getMinMaxTime = (date: string) => {
     const minMaxTimes: { [key: string]: { minTime: string; maxTime: string } } = {
-      "2025-01-10": { minTime: "16:00", maxTime: "22:00" },
-      // Add more date-specific min/max time pairs here
+   
     };
 
-    return minMaxTimes[date] || { minTime: "00:00", maxTime: "23:59" };
+    return minMaxTimes[date] || { minTime: "", maxTime: "" };
   };
-
+   // ⚠️ Handle selectedDate only when creating (editingId is null)
+   useEffect(() => {
+    if (!editingId && selectedDate) {
+      setDate(selectedDate);
+      setTitle('');
+      setStartTime('');
+      setEndTime('');
+    }
+  }, [selectedDate, editingId]);
   // Fetch event details if editing an event
   useEffect(() => {
-    if (editingId) {
-      const fetchEventDetails = async () => {
-        const res = await fetch(`/api/events/${editingId}`);
-        const data = await res.json();
-        setTitle(data.title);
-        setDate(data.date);
-        setStartTime(data.startTime || "00:00");
-        setEndTime(data.endTime || "00:00");
-        setIsAllDay(data.isAllDay || false);
-        
-        // Manually update flatpickr input values
-        if (dateInputRef.current) {
-          dateInputRef.current.value = data.date;
+    const fetchEvent = async () => {
+      if (editingId) {
+        try {
+          const res = await fetch(`/api/events/${editingId}`);
+          const data = await res.json();
+
+          if (res.ok && data?.event) {
+            setTitle(data.event.title || '');
+            setDate(data.event.date?.substring(0, 10) || '');
+            setStartTime(data.event.startTime || '');
+            setEndTime(data.event.endTime || '');
+          } else {
+            console.error('Error fetching event:', data.error);
+          }
+        } catch (err) {
+          console.error('Fetch error:', err);
         }
-        if (startTimeRef.current && data.startTime) {
-          startTimeRef.current.value = data.startTime;
-        }
-        if (endTimeRef.current && data.endTime) {
-          endTimeRef.current.value = data.endTime;
-        }
-        
-      };
-      fetchEventDetails();
-    } else {
-      setTitle("");
-      setDate(selectedDate || "");
-      setStartTime(null); // Or "00:00" as default
-      setEndTime(null); // Or "00:00" as default
-      setIsAllDay(false); // Default to false (not all day)
+      }
+    };
+
+    if (open) {
+      fetchEvent();
     }
-  }, [editingId, selectedDate]);
+  }, [editingId, open]);
 
   // Initialize date picker for the date field (not the time fields)
   useEffect(() => {

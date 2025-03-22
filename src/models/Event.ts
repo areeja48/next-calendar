@@ -6,6 +6,7 @@ export interface IEvent extends Document {
   userEmail: string;
   startTime?: string;
   endTime?: string;
+  isAllDay?: boolean;
 }
 
 const EventSchema = new Schema<IEvent>({
@@ -13,7 +14,8 @@ const EventSchema = new Schema<IEvent>({
   date: { type: String, required: true },
   userEmail: { type: String, required: true },
   startTime: { type: String }, // ✅ NEW
-  endTime: { type: String },   // ✅ NEW
+  endTime: { type: String },   // ✅ NEW,
+  isAllDay: { type: Boolean, default: false },
 });
 
 export default models.Event || mongoose.model<IEvent>('Event', EventSchema);

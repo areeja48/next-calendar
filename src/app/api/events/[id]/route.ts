@@ -12,7 +12,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { title, date, startTime, endTime } = await req.json(); // ✅ include new fields
+    const { title, date, startTime, endTime, isAllDay } = await req.json(); // ✅ include new fields
 
     const id = req.nextUrl.pathname.split('/').pop() || '';
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -23,7 +23,7 @@ export async function PUT(req: NextRequest) {
 
     const updatedEvent = await Event.findOneAndUpdate(
       { _id: id, userEmail: session.user.email },
-      { title, date, startTime, endTime }, // ✅ update all fields
+      { title, date, startTime, endTime, isAllDay }, // ✅ update all fields
       { new: true }
     );
 
@@ -61,6 +61,33 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ message: 'Event deleted successfully' });
   } catch (err) {
     console.error('DELETE error:', err);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const id = req.nextUrl.pathname.split('/').pop() || '';
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
+    }
+
+    await dbConnect();
+
+    const event = await Event.findOne({ _id: id, userEmail: session.user.email });
+
+    if (!event) {
+      return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ event });
+  } catch (err) {
+    console.error('GET error:', err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

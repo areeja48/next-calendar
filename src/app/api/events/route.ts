@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { title, date, startTime, endTime } = await req.json(); // ✅ updated
+    const { title, date, startTime, endTime, isAllDay } = await req.json(); // ✅ updated
     await dbConnect();
 
     const newEvent = await Event.create({
@@ -36,6 +36,7 @@ export async function POST(req: Request) {
       date,
       startTime, // ✅ new field
       endTime,   // ✅ new field
+      isAllDay,
       userEmail: session.user.email,
     });
 

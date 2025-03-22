@@ -9,11 +9,11 @@ export default function SignInPage() {
   const { status } = useSession()
   const router = useRouter()
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (status === 'authenticated') {
       router.push('/dashboard')
     }
-  }, [status, router])
+  }, [status, router])*/
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
