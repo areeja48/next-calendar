@@ -1,6 +1,6 @@
 // src/app/api/google/calendar/get_events/route.ts
 import { google } from 'googleapis';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
