@@ -1,8 +1,22 @@
 'use client';
 import { useEffect, useState } from 'react';
 
+type CalendarEvent = {
+  id: string;
+  summary: string;
+  description?: string;
+  start: {
+    dateTime?: string;
+    date?: string;
+  };
+  end: {
+    dateTime?: string;
+    date?: string;
+  };
+};
+
 export default function GoogleCalendarEvents() {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -17,6 +31,7 @@ export default function GoogleCalendarEvents() {
           setError(data.error || 'Failed to fetch events');
         }
       } catch (err) {
+        console.error('Error fetching events:', err);
         setError('Error fetching events');
       } finally {
         setLoading(false);
@@ -33,14 +48,14 @@ export default function GoogleCalendarEvents() {
     <div className="p-4">
       <h2 className="text-lg font-semibold mb-2">Google Calendar Events</h2>
       <ul className="space-y-2">
-        {events.map((event: any) => (
+        {events.map((event) => (
           <li key={event.id} className="border p-2 rounded bg-gray-100">
             <strong>{event.summary}</strong>
             <div className="text-sm text-gray-600">
               {event.start?.dateTime
                 ? new Date(event.start.dateTime).toLocaleString()
                 : event.start?.date}
-              {' '} → {' '}
+              {' '}→{' '}
               {event.end?.dateTime
                 ? new Date(event.end.dateTime).toLocaleString()
                 : event.end?.date}

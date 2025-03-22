@@ -40,8 +40,9 @@ export default function CreateEventForm() {
         setMessage(`❌ Failed: ${data.error}`);
       }
     } catch (err) {
+      console.error('Error creating event:', err);
       setMessage('❌ Error creating event');
-    } finally {
+    }finally {
       setLoading(false);
     }
   };
