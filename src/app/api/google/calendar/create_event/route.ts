@@ -1,5 +1,7 @@
 // src/app/api/google/calendar/create_event/route.ts
 import { google } from 'googleapis';
+
+
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { NextResponse } from 'next/server';
@@ -18,12 +20,12 @@ export async function POST(req: Request) {
   console.log('Received startTime:', startTime);
   console.log('Received endTime:', endTime);
 
-  // Validate
+  // Validate required fields
   if (!summary || !startTime || !endTime) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
-  // Convert to proper Date objects
+  // Convert to Date objects
   const startDateTime = new Date(startTime);
   const endDateTime = new Date(endTime);
 
@@ -48,8 +50,13 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ message: 'Event created successfully', event: response.data });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error inserting event:', error);
+
+    if (error instanceof Error) {
+      return NextResponse.json({ error: `Failed to create event: ${error.message}` }, { status: 500 });
+    }
+
     return NextResponse.json({ error: 'Failed to create event in Google Calendar' }, { status: 500 });
   }
 }
