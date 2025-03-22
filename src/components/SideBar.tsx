@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CalendarDays, LayoutDashboard, PlusCircle } from 'lucide-react';
+import { LayoutDashboard, PlusCircle } from 'lucide-react';
 
 type SideBarProps = {
   onAddGoogleEventClick: () => void;
