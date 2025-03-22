@@ -1,6 +1,6 @@
 import dbConnect from '@/lib/dbConnect';
 import Event from '@/models/Event';
-import { getServerSession } from 'next-auth';
+import  getServerSession  from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
