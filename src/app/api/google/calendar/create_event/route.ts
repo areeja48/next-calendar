@@ -1,31 +1,29 @@
 // src/app/api/google/calendar/create_event/route.ts
+
 import { google } from 'googleapis';
+import { NextRequest, NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
+export async function POST(req: NextRequest) {
+  // Get token from cookies (App Router style)
+  const token = await getToken({ req });
 
-import  getServerSession  from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
-import { NextResponse } from 'next/server';
-
-export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.accessToken) {
+  // Check if token or access token is missing
+  if (!token || !token.accessToken) {
     return NextResponse.json({ error: 'Unauthorized - No access token' }, { status: 401 });
   }
 
   const body = await req.json();
   const { summary, description, startTime, endTime } = body;
 
-  // Debug logs
   console.log('Received startTime:', startTime);
   console.log('Received endTime:', endTime);
 
-  // Validate required fields
+  // Validate input
   if (!summary || !startTime || !endTime) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
-  // Convert to Date objects
   const startDateTime = new Date(startTime);
   const endDateTime = new Date(endTime);
 
@@ -34,8 +32,11 @@ export async function POST(req: Request) {
   }
 
   try {
+    // Setup Google Auth
     const oauth2Client = new google.auth.OAuth2();
-    oauth2Client.setCredentials({ access_token: session.accessToken });
+    oauth2Client.setCredentials({
+      access_token: token.accessToken as string,
+    });
 
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
@@ -44,12 +45,19 @@ export async function POST(req: Request) {
       requestBody: {
         summary,
         description,
-        start: { dateTime: startDateTime.toISOString() },
-        end: { dateTime: endDateTime.toISOString() },
+        start: {
+          dateTime: startDateTime.toISOString(),
+        },
+        end: {
+          dateTime: endDateTime.toISOString(),
+        },
       },
     });
 
-    return NextResponse.json({ message: 'Event created successfully', event: response.data });
+    return NextResponse.json({
+      message: 'Event created successfully',
+      event: response.data,
+    });
   } catch (error: unknown) {
     console.error('Error inserting event:', error);
 
