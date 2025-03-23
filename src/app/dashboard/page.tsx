@@ -26,6 +26,7 @@ export default function DashboardPage() {
   const [events, setEvents] = useState<EventData[]>([]);
 
 
+
   const fetchEvents = async () => {
     try {
       const res = await fetch('/api/events');
