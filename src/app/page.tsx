@@ -13,12 +13,12 @@ return (
         <p className="text-gray-600 dark:text-gray-300 mb-6">
           Access your personalized event dashboard
         </p>
-        <button
-          onClick={() => signIn('google')}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition duration-200"
-        >
-          Sign in with Google
-        </button>
+      
+    <div className="h-screen flex items-center justify-center">
+      <button onClick={() => signIn('google')} className="px-4 py-2 bg-blue-600 text-white rounded">
+        Sign in with Google
+      </button>
+    </div>
       </div>
     </div>
   )
