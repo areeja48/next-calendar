@@ -25,7 +25,7 @@ export default function DashboardPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [events, setEvents] = useState<EventData[]>([]);
-  const [showGoogleModal, setShowGoogleModal] = useState(false); // ✅ Add this line
+
 
   const fetchEvents = async () => {
     try {
