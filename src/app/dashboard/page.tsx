@@ -91,12 +91,12 @@ export default function DashboardPage() {
         />
         
          {/* Show Google Event Form when triggered */}
-  {showGoogleModal && (
-    <CreateEventForm
-      onClose={() => setShowGoogleModal(false)}
-      fetchEvents={fetchEvents}
-    />
-  )}
+         {showGoogleModal && (
+         <CreateEventForm
+          onClose={() => setShowGoogleModal(false)}
+          fetchEvents={fetchEvents}
+  />
+)}
    
    <div className="p-6">
       <GoogleCalendarEvents />
