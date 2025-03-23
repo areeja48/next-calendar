@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import FloatingActionButton from '@/components/FAB';
 import CalendarWrapper from '@/components/CalendarWrapper';
 import EventModel from '@/components/EventModel'; // Ensure correct file name
-import CreateEventForm from '@/components/CreateGoogleEvent';
 import GoogleCalendarEvents from '@/components/GetGoogleEvent';
 // ✅ Updated event type
 interface EventData {
