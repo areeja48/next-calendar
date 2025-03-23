@@ -2,7 +2,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import type { AuthOptions } from 'next-auth'
 import { JWT } from 'next-auth/jwt'
 import { signIn } from 'next-auth/react'
-
+import 'next-auth';
 export const authOptions: AuthOptions = {
   providers: [
     GoogleProvider({
