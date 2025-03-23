@@ -14,7 +14,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
       <ClientSessionProvider>
       <Header />
-      <SideBar/>
+      <SideBar onAddGoogleEventClick={() => {}} />
+
       <div className="pt-16 h-full"> {/* Add padding-top for the fixed header height */}
         {children}
       </div>
