@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import FloatingActionButton from '@/components/FAB';
 import CalendarWrapper from '@/components/CalendarWrapper';
 import EventModel from '@/components/EventModel'; // Ensure correct file name
-import SideBar  from '@/components/SideBar';
 import CreateEventForm from '@/components/CreateGoogleEvent';
 import GoogleCalendarEvents from '@/components/GetGoogleEvent';
 // ✅ Updated event type
@@ -61,7 +60,7 @@ export default function DashboardPage() {
   return (
     <div className="flex h-screen overflow-hidden">
      
-     <SideBar onAddGoogleEventClick={() => setShowGoogleModal(true)} />
+     
       {/* Main Content */}
       <div className="ml-64 flex-1 flex flex-col">
     
@@ -90,13 +89,7 @@ export default function DashboardPage() {
           selectedDate={selectedDate}
         />
         
-         {/* Show Google Event Form when triggered */}
-         {showGoogleModal && (
-         <CreateEventForm
-          onClose={() => setShowGoogleModal(false)}
-          fetchEvents={fetchEvents}
-  />
-)}
+         
    
    <div className="p-6">
       <GoogleCalendarEvents />
