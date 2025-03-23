@@ -1,8 +1,7 @@
 import GoogleProvider from 'next-auth/providers/google'
 import type { AuthOptions } from 'next-auth'
-import { JWT } from 'next-auth/jwt'
 import { signIn } from 'next-auth/react'
-import 'next-auth';
+
 export const authOptions: AuthOptions = {
   providers: [
     GoogleProvider({
@@ -10,10 +9,9 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
-          scope: "openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/calendar.events",
+          scope: 'openid email profile https://www.googleapis.com/auth/calendar.events',
+          access_type: 'offline',
+          prompt: 'consent',
         },
       },
     }),
@@ -27,81 +25,48 @@ export const authOptions: AuthOptions = {
   },
   callbacks: {
     async jwt({ token, account, user, trigger, session }) {
-      if (user) {
-        token.name = user.name || '';
-        token.email = user.email || '';
-        token.role = 'user';
-        token.image = user.image || '';
-      }
-
-      if (trigger === 'update' && session?.user?.name) {
-        token.name = session.user.name;
-      }
-
+      // First time sign-in
       if (account) {
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token;
-        token.accessTokenExpires = account.expires_at! * 1000;
+        token.accessToken = account.access_token
+        token.refreshToken = account.refresh_token
+        token.accessTokenExpires = account.expires_at
+        token.name = user?.name || user?.email?.split('@')[0] || ''
+        token.email = user?.email || ''
+        token.role = 'user',
+        token.picture = user?.image || ''
       }
 
-      // If token still valid
-      if (Date.now() < (token.accessTokenExpires || 0)) {
-        return token;
+      // Handle user info update via session trigger
+      if (trigger === 'update' && session?.user?.name) {
+        token.name = session.user.name
       }
 
-      // Otherwise refresh
-      return await refreshAccessToken(token);
+      // TODO: You can optionally implement refresh token logic here if needed
+
+      return token
     },
+
     async session({ session, token }) {
       session.user = {
         ...session.user,
         name: token.name as string,
         email: token.email as string,
         role: token.role as string,
-        image: token.image as string,
-      };
-      session.accessToken = token.accessToken;
-      session.refreshToken = token.refreshToken;
-      return session;
+        image: token.picture as string
+      }
+      session.accessToken = token.accessToken as string
+      session.refreshToken = token.refreshToken as string
+      session.accessTokenExpires = token.accessTokenExpires as number
+      return session
     },
+
     async redirect({ baseUrl }) {
-      return `${baseUrl}/dashboard`;
+      return `${baseUrl}/dashboard`
     },
   },
-};
-
-async function refreshAccessToken(token: JWT) {
-  try {
-    const response = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        client_id: process.env.GOOGLE_CLIENT_ID!,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        grant_type: "refresh_token",
-        refresh_token: token.refreshToken as string,
-      }),
-    });
-
-    const refreshedTokens = await response.json();
-
-    if (!response.ok) throw refreshedTokens;
-
-    return {
-      ...token,
-      accessToken: refreshedTokens.access_token,
-      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
-      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
-    };
-  } catch (error) {
-    console.error("Error refreshing access token", error);
-    return {
-      ...token,
-      error: "RefreshAccessTokenError",
-    };
-  }
 }
 
+// Optional helper
 export const signInWithGoogle = async () => {
-  await signIn('google');
-};
+  await signIn('google')
+}
