@@ -8,15 +8,24 @@ interface EventModalProps {
   setOpen: (value: boolean) => void;
   editingId: string | null;
   refreshEvents: () => void;
-  selectedDate : string | null
+  selectedDate?: string | null;
+}
+
+interface EventType {
+  _id: string;
+  title: string;
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  isAllDay?: boolean;
 }
 
 export default function EventModel({
   open,
   setOpen,
   editingId,
-  refreshEvents, 
-  selectedDate
+  refreshEvents,
+  selectedDate,
 }: EventModalProps) {
   const [form, setForm] = useState({
     title: '',
@@ -26,13 +35,12 @@ export default function EventModel({
     isAllDay: false,
   });
 
-  // Fetch event on edit
   useEffect(() => {
     if (editingId) {
       fetch('/api/events')
-        .then(res => res.json())
-        .then(events => {
-          const event = events.find((e: any) => e._id === editingId);
+        .then((res) => res.json())
+        .then((events: EventType[]) => {
+          const event = events.find((e) => e._id === editingId);
           if (event) {
             setForm({
               title: event.title,
@@ -46,13 +54,13 @@ export default function EventModel({
     } else {
       setForm({
         title: '',
-        date: '',
+        date: selectedDate || '',
         startTime: '',
         endTime: '',
         isAllDay: false,
       });
     }
-  }, [editingId]);
+  }, [editingId, selectedDate]);
 
   useEffect(() => {
     if (open) {
@@ -70,7 +78,7 @@ export default function EventModel({
     }
   }, [open]);
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({
       ...prev,
@@ -78,7 +86,7 @@ export default function EventModel({
     }));
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const method = editingId ? 'PUT' : 'POST';
     const body = JSON.stringify(editingId ? { ...form, id: editingId } : form);

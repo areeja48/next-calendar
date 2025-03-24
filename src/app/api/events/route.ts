@@ -5,7 +5,7 @@ import  Event from '@/models/Event';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   await connectDB();
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email;
@@ -15,7 +15,6 @@ export async function GET(req: NextRequest) {
   const events = await Event.find({ userEmail }).sort({ date: 1 });
   return NextResponse.json(events);
 }
-
 export async function POST(req: NextRequest) {
   await connectDB();
   const session = await getServerSession(authOptions);
