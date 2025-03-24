@@ -1,7 +1,9 @@
-// src/components/EventModel.tsx
+// src/components/EventModal.tsx
+'use client';
+
 import { useState, useEffect, useRef } from "react";
 import flatpickr from "flatpickr";
-import "flatpickr/dist/flatpickr.css"; // Import flatpickr styles
+import "flatpickr/dist/flatpickr.css";
 
 interface EventModalProps {
   open: boolean;
@@ -16,30 +18,24 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);
-  const [isAllDay, setIsAllDay] = useState(false); // State to track if the event is all-day
+  const [isAllDay, setIsAllDay] = useState(false);
 
-  const dateInputRef = useRef<HTMLInputElement | null>(null); // Reference for the date input
-  const startTimeRef = useRef<HTMLInputElement | null>(null); // Reference for the start time input
-  const endTimeRef = useRef<HTMLInputElement | null>(null); // Reference for the end time input
+  const dateInputRef = useRef<HTMLInputElement | null>(null);
+  const startTimeRef = useRef<HTMLInputElement | null>(null);
+  const endTimeRef = useRef<HTMLInputElement | null>(null);
 
-  // Handle Min/Max Time for specific dates
-  const getMinMaxTime = (date: string) => {
-    const minMaxTimes: { [key: string]: { minTime: string; maxTime: string } } = {
-   
-    };
-
-    return minMaxTimes[date] || { minTime: "", maxTime: "" };
-  };
-   // ⚠️ Handle selectedDate only when creating (editingId is null)
-   useEffect(() => {
+  // Handle selectedDate when creating
+  useEffect(() => {
     if (!editingId && selectedDate) {
       setDate(selectedDate);
       setTitle('');
       setStartTime('');
       setEndTime('');
+      setIsAllDay(false);
     }
   }, [selectedDate, editingId]);
-  // Fetch event details if editing an event
+
+  // Fetch event details if editing
   useEffect(() => {
     const fetchEvent = async () => {
       if (editingId) {
@@ -52,6 +48,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
             setDate(data.event.date?.substring(0, 10) || '');
             setStartTime(data.event.startTime || '');
             setEndTime(data.event.endTime || '');
+            setIsAllDay(data.event.isAllDay || false);
           } else {
             console.error('Error fetching event:', data.error);
           }
@@ -61,19 +58,17 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
       }
     };
 
-    if (open) {
-      fetchEvent();
-    }
+    if (open) fetchEvent();
   }, [editingId, open]);
 
-  // Initialize date picker for the date field (not the time fields)
+  // Initialize flatpickr for date
   useEffect(() => {
     if (dateInputRef.current) {
       const fp = flatpickr(dateInputRef.current, {
         dateFormat: "Y-m-d",
         defaultDate: date,
-        onChange: (selectedDates) => {
-          setDate(selectedDates[0].toISOString().split("T")[0]);
+        onChange: (dates) => {
+          setDate(dates[0].toISOString().split("T")[0]);
         },
       });
 
@@ -83,76 +78,81 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
 
   useEffect(() => {
     if (startTimeRef.current && !isAllDay) {
-      const fpStartTime = flatpickr(startTimeRef.current, {
+      const fpStart = flatpickr(startTimeRef.current, {
         enableTime: true,
         noCalendar: true,
-        dateFormat: "H:i", // Only time (HH:mm)
-        onChange: (selectedDates) => {
-          setStartTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
+        dateFormat: "H:i",
+        defaultDate: startTime || undefined,
+        onChange: (dates) => {
+          setStartTime(dates[0].toISOString().split("T")[1].slice(0, 5));
         },
-        minTime: getMinMaxTime(date).minTime, // Use the custom minTime
-        maxTime: getMinMaxTime(date).maxTime, // Use the custom maxTime
       });
 
-      return () => fpStartTime.destroy();
+      return () => fpStart.destroy();
     }
-  }, [startTime, date, isAllDay]);
+  }, [startTime, isAllDay]);
 
   useEffect(() => {
     if (endTimeRef.current && !isAllDay) {
-      const fpEndTime = flatpickr(endTimeRef.current, {
+      const fpEnd = flatpickr(endTimeRef.current, {
         enableTime: true,
         noCalendar: true,
-        dateFormat: "H:i", // Only time (HH:mm)
-        onChange: (selectedDates) => {
-          setEndTime(selectedDates[0].toISOString().split("T")[1].slice(0, 5)); // Extract time in HH:mm format
+        dateFormat: "H:i",
+        defaultDate: endTime || undefined,
+        onChange: (dates) => {
+          setEndTime(dates[0].toISOString().split("T")[1].slice(0, 5));
         },
-        minTime: getMinMaxTime(date).minTime, // Use the custom minTime
-        maxTime: getMinMaxTime(date).maxTime, // Use the custom maxTime
       });
 
-      return () => fpEndTime.destroy();
+      return () => fpEnd.destroy();
     }
-  }, [endTime, date, isAllDay]);
+  }, [endTime, isAllDay]);
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const eventData = { title, date, startTime, endTime, isAllDay };
 
-    if (editingId) {
-      await fetch(`/api/events/${editingId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(eventData),
-      });
-    } else {
-      await fetch("/api/events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(eventData),
-      });
-    }
-
-    onClose();
-    fetchEvents();
-  };
-
-  // Handle event deletion
-  const handleDelete = async () => {
-    if (editingId) {
-      await fetch(`/api/events/${editingId}`, { method: "DELETE" });
+    try {
+      if (editingId) {
+        await fetch(`/api/events/${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(eventData),
+        });
+      } else {
+        await fetch("/api/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(eventData),
+        });
+      }
       onClose();
       fetchEvents();
+    } catch (error) {
+      console.error("Submit error:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (editingId) {
+      try {
+        await fetch(`/api/events/${editingId}`, { method: "DELETE" });
+        onClose();
+        fetchEvents();
+      } catch (error) {
+        console.error("Delete error:", error);
+      }
     }
   };
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-transparent bg-opacity-50 z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded-xl w-96 shadow-lg">
-        <h2 className="text-2xl font-semibold mb-4">{editingId ? "Edit Event" : "Create Event"}</h2>
+        <h2 className="text-2xl font-semibold mb-4">
+          {editingId ? "Edit Event" : "Create Event"}
+        </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="title" className="block text-sm font-medium">Title</label>
@@ -165,6 +165,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
               className="w-full p-2 border rounded-md"
             />
           </div>
+
           <div className="mb-4">
             <label htmlFor="date" className="block text-sm font-medium">Date</label>
             <input
@@ -178,21 +179,19 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
             />
           </div>
 
-          {/* Toggle Button for All Day Event */}
           <div className="mb-4">
             <label htmlFor="isAllDay" className="inline-flex items-center">
               <input
                 id="isAllDay"
                 type="checkbox"
                 checked={isAllDay}
-                onChange={() => setIsAllDay(!isAllDay)} // Toggle the all-day event flag
+                onChange={() => setIsAllDay(!isAllDay)}
                 className="form-checkbox"
               />
               <span className="ml-2 text-sm">All Day Event</span>
             </label>
           </div>
 
-          {/* Conditionally Render Time Fields if Not All Day */}
           {!isAllDay && (
             <>
               <div className="mb-4">
@@ -201,7 +200,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
                   id="startTime"
                   ref={startTimeRef}
                   type="text"
-                  value={startTime || ""} // Ensure it shows nothing if null
+                  value={startTime || ""}
                   required
                   className="w-full p-2 border rounded-md"
                 />
@@ -212,7 +211,7 @@ const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: Eve
                   id="endTime"
                   ref={endTimeRef}
                   type="text"
-                  value={endTime || ""} // Ensure it shows nothing if null
+                  value={endTime || ""}
                   required
                   className="w-full p-2 border rounded-md"
                 />

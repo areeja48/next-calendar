@@ -1,3 +1,4 @@
+// /api/events/route.ts
 import dbConnect from '@/lib/dbConnect';
 import Event from '@/models/Event';
 import  getServerSession  from 'next-auth';
