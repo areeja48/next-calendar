@@ -1,245 +1,190 @@
-// src/components/EventModal.tsx
 'use client';
-
-import { useState, useEffect, useRef } from "react";
-import flatpickr from "flatpickr";
-import "flatpickr/dist/flatpickr.css";
+import { useEffect, useState } from 'react';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 interface EventModalProps {
   open: boolean;
-  onClose: () => void;
+  setOpen: (value: boolean) => void;
   editingId: string | null;
-  selectedDate: string | null;
-  fetchEvents: () => void;
+  refreshEvents: () => void;
+  selectedDate : string | null
 }
 
-const EventModal = ({ open, onClose, editingId, selectedDate, fetchEvents }: EventModalProps) => {
-  const [title, setTitle] = useState("");
-  const [date, setDate] = useState("");
-  const [startTime, setStartTime] = useState<string | null>(null);
-  const [endTime, setEndTime] = useState<string | null>(null);
-  const [isAllDay, setIsAllDay] = useState(false);
+export default function EventModel({
+  open,
+  setOpen,
+  editingId,
+  refreshEvents, 
+  selectedDate
+}: EventModalProps) {
+  const [form, setForm] = useState({
+    title: '',
+    date: '',
+    startTime: '',
+    endTime: '',
+    isAllDay: false,
+  });
 
-  const dateInputRef = useRef<HTMLInputElement | null>(null);
-  const startTimeRef = useRef<HTMLInputElement | null>(null);
-  const endTimeRef = useRef<HTMLInputElement | null>(null);
-
-  // Handle selectedDate when creating
+  // Fetch event on edit
   useEffect(() => {
-    if (!editingId && selectedDate) {
-      setDate(selectedDate);
-      setTitle('');
-      setStartTime('');
-      setEndTime('');
-      setIsAllDay(false);
-    }
-  }, [selectedDate, editingId]);
-
-  // Fetch event details if editing
-  useEffect(() => {
-    const fetchEvent = async () => {
-      if (editingId) {
-        try {
-          const res = await fetch(`/api/events/${editingId}`);
-          const data = await res.json();
-
-          if (res.ok && data?.event) {
-            setTitle(data.event.title || '');
-            setDate(data.event.date?.substring(0, 10) || '');
-            setStartTime(data.event.startTime || '');
-            setEndTime(data.event.endTime || '');
-            setIsAllDay(data.event.isAllDay || false);
-          } else {
-            console.error('Error fetching event:', data.error);
+    if (editingId) {
+      fetch('/api/events')
+        .then(res => res.json())
+        .then(events => {
+          const event = events.find((e: any) => e._id === editingId);
+          if (event) {
+            setForm({
+              title: event.title,
+              date: event.date,
+              startTime: event.startTime || '',
+              endTime: event.endTime || '',
+              isAllDay: event.isAllDay || false,
+            });
           }
-        } catch (err) {
-          console.error('Fetch error:', err);
-        }
-      }
-    };
-
-    if (open) fetchEvent();
-  }, [editingId, open]);
-
-  // Initialize flatpickr for date
-  useEffect(() => {
-    if (dateInputRef.current) {
-      const fp = flatpickr(dateInputRef.current, {
-        dateFormat: "Y-m-d",
-        defaultDate: date,
-        onChange: (dates) => {
-          setDate(dates[0].toISOString().split("T")[0]);
-        },
+        });
+    } else {
+      setForm({
+        title: '',
+        date: '',
+        startTime: '',
+        endTime: '',
+        isAllDay: false,
       });
-
-      return () => fp.destroy();
     }
-  }, [date]);
+  }, [editingId]);
 
   useEffect(() => {
-    if (startTimeRef.current && !isAllDay) {
-      const fpStart = flatpickr(startTimeRef.current, {
+    if (open) {
+      flatpickr('#datePicker', { dateFormat: 'Y-m-d' });
+      flatpickr('#startPicker', {
         enableTime: true,
         noCalendar: true,
-        dateFormat: "H:i",
-        defaultDate: startTime || undefined,
-        onChange: (dates) => {
-          setStartTime(dates[0].toISOString().split("T")[1].slice(0, 5));
-        },
+        dateFormat: 'H:i',
       });
-
-      return () => fpStart.destroy();
-    }
-  }, [startTime, isAllDay]);
-
-  useEffect(() => {
-    if (endTimeRef.current && !isAllDay) {
-      const fpEnd = flatpickr(endTimeRef.current, {
+      flatpickr('#endPicker', {
         enableTime: true,
         noCalendar: true,
-        dateFormat: "H:i",
-        defaultDate: endTime || undefined,
-        onChange: (dates) => {
-          setEndTime(dates[0].toISOString().split("T")[1].slice(0, 5));
-        },
+        dateFormat: 'H:i',
       });
-
-      return () => fpEnd.destroy();
     }
-  }, [endTime, isAllDay]);
+  }, [open]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleChange = (e: any) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    const eventData = { title, date, startTime, endTime, isAllDay };
+    const method = editingId ? 'PUT' : 'POST';
+    const body = JSON.stringify(editingId ? { ...form, id: editingId } : form);
 
-    try {
-      if (editingId) {
-        await fetch(`/api/events/${editingId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(eventData),
-        });
-      } else {
-        await fetch("/api/events", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(eventData),
-        });
-      }
-      onClose();
-      fetchEvents();
-    } catch (error) {
-      console.error("Submit error:", error);
-    }
+    await fetch('/api/events', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+
+    setOpen(false);
+    refreshEvents();
   };
 
   const handleDelete = async () => {
-    if (editingId) {
-      try {
-        await fetch(`/api/events/${editingId}`, { method: "DELETE" });
-        onClose();
-        fetchEvents();
-      } catch (error) {
-        console.error("Delete error:", error);
-      }
-    }
+    await fetch('/api/events', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: editingId }),
+    });
+    setOpen(false);
+    refreshEvents();
   };
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-xl w-96 shadow-lg">
-        <h2 className="text-2xl font-semibold mb-4">
-          {editingId ? "Edit Event" : "Create Event"}
+    <div className="fixed inset-0 bg-transparent flex items-center justify-center z-50">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-xl p-6 w-full max-w-md space-y-4 shadow-lg"
+      >
+        <h2 className="text-xl font-semibold">
+          {editingId ? 'Edit Event' : 'Add Event'}
         </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="title" className="block text-sm font-medium">Title</label>
+
+        <input
+          name="title"
+          className="w-full border p-2 rounded"
+          placeholder="Event Title"
+          value={form.title}
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          name="date"
+          id="datePicker"
+          className="w-full border p-2 rounded"
+          placeholder="Select Date"
+          value={form.date}
+          onChange={handleChange}
+          required
+        />
+
+        {!form.isAllDay && (
+          <>
             <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              name="startTime"
+              id="startPicker"
+              className="w-full border p-2 rounded"
+              placeholder="Start Time"
+              value={form.startTime}
+              onChange={handleChange}
               required
-              className="w-full p-2 border rounded-md"
             />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="date" className="block text-sm font-medium">Date</label>
             <input
-              id="date"
-              ref={dateInputRef}
-              type="text"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              name="endTime"
+              id="endPicker"
+              className="w-full border p-2 rounded"
+              placeholder="End Time"
+              value={form.endTime}
+              onChange={handleChange}
               required
-              className="w-full p-2 border rounded-md"
             />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="isAllDay" className="inline-flex items-center">
-              <input
-                id="isAllDay"
-                type="checkbox"
-                checked={isAllDay}
-                onChange={() => setIsAllDay(!isAllDay)}
-                className="form-checkbox"
-              />
-              <span className="ml-2 text-sm">All Day Event</span>
-            </label>
-          </div>
-
-          {!isAllDay && (
-            <>
-              <div className="mb-4">
-                <label htmlFor="startTime" className="block text-sm font-medium">Start Time</label>
-                <input
-                  id="startTime"
-                  ref={startTimeRef}
-                  type="text"
-                  value={startTime || ""}
-                  required
-                  className="w-full p-2 border rounded-md"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="endTime" className="block text-sm font-medium">End Time</label>
-                <input
-                  id="endTime"
-                  ref={endTimeRef}
-                  type="text"
-                  value={endTime || ""}
-                  required
-                  className="w-full p-2 border rounded-md"
-                />
-              </div>
-            </>
-          )}
-
-          <div className="flex justify-between">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded-md">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md">
-              {editingId ? "Update Event" : "Create Event"}
-            </button>
-          </div>
-        </form>
-
-        {editingId && (
-          <div className="mt-4 text-center">
-            <button
-              onClick={handleDelete}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-            >
-              Delete Event
-            </button>
-          </div>
+          </>
         )}
-      </div>
+
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            name="isAllDay"
+            checked={form.isAllDay}
+            onChange={handleChange}
+          />
+          All Day
+        </label>
+
+        <div className="flex justify-between">
+          {editingId && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="text-red-600"
+            >
+              Delete
+            </button>
+          )}
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            {editingId ? 'Update' : 'Add'}
+          </button>
+        </div>
+      </form>
     </div>
   );
-};
-
-export default EventModal;
+}

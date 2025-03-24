@@ -1,49 +1,73 @@
-// /api/events/route.ts
-import dbConnect from '@/lib/dbConnect';
-import Event from '@/models/Event';
-import  getServerSession  from 'next-auth';
+// app/api/events/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB  from '@/lib/dbConnect';
+import  Event from '@/models/Event';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { NextResponse } from 'next/server';
 
-export async function GET() {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+export async function GET(req: NextRequest) {
+  await connectDB();
+  const session = await getServerSession(authOptions);
+  const userEmail = session?.user?.email;
 
-    await dbConnect();
+  if (!userEmail) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const events = await Event.find({ userEmail: session.user.email }).sort({ date: 1 });
-    return NextResponse.json(events, { status: 200 });
-  } catch (error) {
-    console.error('GET error:', error);
-    return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 });
-  }
+  const events = await Event.find({ userEmail }).sort({ date: 1 });
+  return NextResponse.json(events);
 }
 
-export async function POST(req: Request) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+export async function POST(req: NextRequest) {
+  await connectDB();
+  const session = await getServerSession(authOptions);
+  const userEmail = session?.user?.email;
 
-    const { title, date, startTime, endTime, isAllDay } = await req.json(); // ✅ updated
-    await dbConnect();
+  if (!userEmail) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const newEvent = await Event.create({
-      title,
-      date,
-      startTime, // ✅ new field
-      endTime,   // ✅ new field
-      isAllDay,
-      userEmail: session.user.email,
-    });
+  const body = await req.json();
+  const { title, date, startTime, endTime, isAllDay } = body;
 
-    return NextResponse.json({ message: 'Event created successfully', event: newEvent }, { status: 201 });
-  } catch (error) {
-    console.error('POST error:', error);
-    return NextResponse.json({ error: 'Failed to create event' }, { status: 500 });
-  }
+  const newEvent = await Event.create({
+    title,
+    date,
+    startTime,
+    endTime,
+    isAllDay,
+    userEmail,
+  });
+
+  return NextResponse.json(newEvent);
+}
+
+export async function PUT(req: NextRequest) {
+  await connectDB();
+  const session = await getServerSession(authOptions);
+  const userEmail = session?.user?.email;
+
+  if (!userEmail) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const body = await req.json();
+  const { id, title, date, startTime, endTime, isAllDay } = body;
+
+  const updatedEvent = await Event.findOneAndUpdate(
+    { _id: id, userEmail },
+    { title, date, startTime, endTime, isAllDay },
+    { new: true }
+  );
+
+  return NextResponse.json(updatedEvent);
+}
+
+export async function DELETE(req: NextRequest) {
+  await connectDB();
+  const session = await getServerSession(authOptions);
+  const userEmail = session?.user?.email;
+
+  if (!userEmail) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const body = await req.json();
+  const { id } = body;
+
+  await Event.findOneAndDelete({ _id: id, userEmail });
+
+  return NextResponse.json({ success: true });
 }

@@ -27,6 +27,7 @@
     "react": "^19.0.0",
     "react-calendar": "^5.1.0",
     "react-dom": "^19.0.0",
+    "react-flatpickr": "^4.0.0",
     "react-tailwindcss-datepicker": "^2.0.0"
   },
   "devDependencies": {

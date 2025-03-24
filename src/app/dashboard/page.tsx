@@ -5,9 +5,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import FloatingActionButton from '@/components/FAB';
 import CalendarWrapper from '@/components/CalendarWrapper';
-import EventModel from '@/components/EventModel'; // Ensure correct file name
+import EventModal from '@/components/EventModel'; // ✅ Corrected name
 import GoogleCalendarEvents from '@/components/GetGoogleEvent';
-// ✅ Updated event type
+
 interface EventData {
   _id: string;
   title: string;
@@ -24,8 +24,6 @@ export default function DashboardPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [events, setEvents] = useState<EventData[]>([]);
-
-
 
   const fetchEvents = async () => {
     try {
@@ -59,12 +57,8 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-     
-     
-      {/* Main Content */}
+      {/* Sidebar placeholder if you have one */}
       <div className="ml-64 flex-1 flex flex-col">
-    
-        {/* Calendar Section */}
         <main className="flex-1 p-6 pt-16 overflow-y-auto">
           <CalendarWrapper
             events={events}
@@ -73,27 +67,22 @@ export default function DashboardPage() {
           />
         </main>
 
-        {/* Floating Button for New Event */}
+        {/* Floating Action Button */}
         {!open && <FloatingActionButton onClick={handleCreate} />}
 
+        {/* Google Calendar Events Button */}
+        <div className="p-6">
+          <GoogleCalendarEvents />
+        </div>
+
         {/* Event Modal */}
-        <EventModel
+        <EventModal
           open={open}
-          onClose={() => {
-            setOpen(false);
-            setEditingId(null);
-            setSelectedDate(null);
-          }}
+          setOpen={setOpen}
           editingId={editingId}
-          fetchEvents={fetchEvents}
           selectedDate={selectedDate}
+          refreshEvents={fetchEvents}
         />
-        
-         
-   
-   <div className="p-6">
-      <GoogleCalendarEvents />
-    </div>
       </div>
     </div>
   );

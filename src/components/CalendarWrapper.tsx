@@ -5,9 +5,8 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
-import interactionPlugin from '@fullcalendar/interaction'; // For date click
+import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { EventClickArg } from '@fullcalendar/core';
-import { DateClickArg } from '@fullcalendar/interaction';
 import '../app/globals.css';
 
 interface EventData {
@@ -30,6 +29,7 @@ const CalendarWrapper = ({ events, onEventClick, onDateClick }: CalendarWrapperP
     title: event.title,
     start: event.startTime ? `${event.date}T${event.startTime}` : event.date,
     end: event.endTime ? `${event.date}T${event.endTime}` : undefined,
+    allDay: !event.startTime && !event.endTime, // 👈 Set allDay only if no startTime/endTime
   }));
 
   return (
@@ -40,14 +40,14 @@ const CalendarWrapper = ({ events, onEventClick, onDateClick }: CalendarWrapperP
       eventClick={(info: EventClickArg) => onEventClick(info.event.id)}
       dateClick={(info: DateClickArg) => onDateClick(info.dateStr)}
       headerToolbar={{
-        left: 'prev',             // 'prev' button on the left
-        center: 'title',          // Month title in the center
-        right: 'next dayGridMonth,listMonth', // 'next' button and view options (month/list)
+        left: 'prev',
+        center: 'title',
+        right: 'next dayGridMonth,listMonth', // 👈 Added more views
       }}
       height="auto"
+      selectable={true}
     />
   );
- 
 };
 
 export default CalendarWrapper;
