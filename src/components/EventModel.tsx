@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useState, useRef } from 'react';
-import flatpickr from 'flatpickr';
+import { useEffect, useRef, useState } from 'react';
+import Flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
 interface EventModalProps {
@@ -29,17 +29,17 @@ export default function EventModal({
 }: EventModalProps) {
   const [form, setForm] = useState({
     title: '',
-    date: '',
+    date: selectedDate || '',
     startTime: '',
     endTime: '',
     isAllDay: false,
   });
 
-  // **Refs for Flatpickr**
   const datePickerRef = useRef<HTMLInputElement>(null);
-  const startPickerRef = useRef<HTMLInputElement>(null);
-  const endPickerRef = useRef<HTMLInputElement>(null);
+  const startTimePickerRef = useRef<HTMLInputElement>(null);
+  const endTimePickerRef = useRef<HTMLInputElement>(null);
 
+  // Load event details when editing
   useEffect(() => {
     if (editingId) {
       fetch('/api/events')
@@ -67,42 +67,55 @@ export default function EventModal({
     }
   }, [editingId, selectedDate]);
 
+  // Initialize Flatpickr when the modal opens
   useEffect(() => {
     if (open) {
       if (datePickerRef.current) {
-        flatpickr(datePickerRef.current, {
+        Flatpickr(datePickerRef.current, {
           dateFormat: 'Y-m-d',
           defaultDate: form.date,
           onChange: (selectedDates) => {
-            setForm((prev) => ({ ...prev, date: selectedDates[0].toISOString().split('T')[0] }));
+            setForm((prev) => ({
+              ...prev,
+              date: selectedDates[0].toISOString().split('T')[0],
+            }));
           },
         });
       }
-      if (startPickerRef.current) {
-        flatpickr(startPickerRef.current, {
+
+      if (startTimePickerRef.current) {
+        Flatpickr(startTimePickerRef.current, {
           enableTime: true,
           noCalendar: true,
           dateFormat: 'H:i',
           defaultDate: form.startTime,
           onChange: (selectedDates) => {
-            setForm((prev) => ({ ...prev, startTime: selectedDates[0].toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }));
+            setForm((prev) => ({
+              ...prev,
+              startTime: selectedDates[0].toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            }));
           },
         });
       }
-      if (endPickerRef.current) {
-        flatpickr(endPickerRef.current, {
+
+      if (endTimePickerRef.current) {
+        Flatpickr(endTimePickerRef.current, {
           enableTime: true,
           noCalendar: true,
           dateFormat: 'H:i',
           defaultDate: form.endTime,
           onChange: (selectedDates) => {
-            setForm((prev) => ({ ...prev, endTime: selectedDates[0].toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }));
+            setForm((prev) => ({
+              ...prev,
+              endTime: selectedDates[0].toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            }));
           },
         });
       }
     }
-  }, [open]); // Ensures Flatpickr initializes when modal opens
+  }, [open, form.date, form.startTime, form.endTime]);
 
+  // Update state when input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({
@@ -111,8 +124,15 @@ export default function EventModal({
     }));
   };
 
+  // Handle form submission (Create/Update Event)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!form.title.trim()) {
+      alert('Title is required');
+      return;
+    }
+
     const method = editingId ? 'PUT' : 'POST';
     const body = JSON.stringify(editingId ? { ...form, id: editingId } : form);
 
@@ -126,6 +146,7 @@ export default function EventModal({
     refreshEvents();
   };
 
+  // Handle event deletion
   const handleDelete = async () => {
     await fetch('/api/events', {
       method: 'DELETE',
@@ -139,7 +160,7 @@ export default function EventModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-transparent flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
       <form
         onSubmit={handleSubmit}
         className="bg-white rounded-xl p-6 w-full max-w-md space-y-4 shadow-lg"
@@ -148,6 +169,7 @@ export default function EventModal({
           {editingId ? 'Edit Event' : 'Add Event'}
         </h2>
 
+        {/* Event Title */}
         <input
           name="title"
           className="w-full border p-2 rounded"
@@ -157,64 +179,52 @@ export default function EventModal({
           required
         />
 
+        {/* Date Picker */}
         <input
-          name="date"
           ref={datePickerRef}
           className="w-full border p-2 rounded"
           placeholder="Select Date"
-          value={form.date}
           readOnly
-          required
         />
 
+        {/* Time Pickers */}
         {!form.isAllDay && (
           <>
             <input
-              name="startTime"
-              ref={startPickerRef}
+              ref={startTimePickerRef}
               className="w-full border p-2 rounded"
               placeholder="Start Time"
-              value={form.startTime}
               readOnly
-              required
             />
             <input
-              name="endTime"
-              ref={endPickerRef}
+              ref={endTimePickerRef}
               className="w-full border p-2 rounded"
               placeholder="End Time"
-              value={form.endTime}
               readOnly
-              required
             />
           </>
         )}
 
-        <label className="flex items-center gap-2">
+        {/* All Day Event Checkbox */}
+        <div className="flex items-center space-x-2">
           <input
             type="checkbox"
             name="isAllDay"
             checked={form.isAllDay}
             onChange={handleChange}
           />
-          All Day
-        </label>
+          <label>All Day Event</label>
+        </div>
 
-        <div className="flex justify-between">
+        {/* Action Buttons */}
+        <div className="flex justify-end space-x-2">
           {editingId && (
-            <button
-              type="button"
-              onClick={handleDelete}
-              className="text-red-600"
-            >
+            <button type="button" onClick={handleDelete} className="bg-red-500 text-white px-4 py-2 rounded">
               Delete
             </button>
           )}
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            {editingId ? 'Update' : 'Add'}
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+            {editingId ? 'Update' : 'Create'}
           </button>
         </div>
       </form>
