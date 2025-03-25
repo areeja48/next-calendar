@@ -9,11 +9,13 @@ export async function GET() {
   await connectDB();
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email;
-
+  console.log("Session:", session); // ✅ Debug session
   if (!userEmail) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const events = await Event.find({ userEmail }).sort({ date: 1 });
+  console.log("Events",events); 
   return NextResponse.json(events);
+
 }
 export async function POST(req: NextRequest) {
   await connectDB();
