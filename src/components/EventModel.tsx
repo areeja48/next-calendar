@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -20,7 +20,7 @@ interface EventType {
   isAllDay?: boolean;
 }
 
-export default function EventModel({
+export default function EventModal({
   open,
   setOpen,
   editingId,
@@ -34,6 +34,11 @@ export default function EventModel({
     endTime: '',
     isAllDay: false,
   });
+
+  // **Refs for Flatpickr**
+  const datePickerRef = useRef<HTMLInputElement>(null);
+  const startPickerRef = useRef<HTMLInputElement>(null);
+  const endPickerRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (editingId) {
@@ -64,19 +69,39 @@ export default function EventModel({
 
   useEffect(() => {
     if (open) {
-      flatpickr('#datePicker', { dateFormat: 'Y-m-d' });
-      flatpickr('#startPicker', {
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: 'H:i',
-      });
-      flatpickr('#endPicker', {
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: 'H:i',
-      });
+      if (datePickerRef.current) {
+        flatpickr(datePickerRef.current, {
+          dateFormat: 'Y-m-d',
+          defaultDate: form.date,
+          onChange: (selectedDates) => {
+            setForm((prev) => ({ ...prev, date: selectedDates[0].toISOString().split('T')[0] }));
+          },
+        });
+      }
+      if (startPickerRef.current) {
+        flatpickr(startPickerRef.current, {
+          enableTime: true,
+          noCalendar: true,
+          dateFormat: 'H:i',
+          defaultDate: form.startTime,
+          onChange: (selectedDates) => {
+            setForm((prev) => ({ ...prev, startTime: selectedDates[0].toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }));
+          },
+        });
+      }
+      if (endPickerRef.current) {
+        flatpickr(endPickerRef.current, {
+          enableTime: true,
+          noCalendar: true,
+          dateFormat: 'H:i',
+          defaultDate: form.endTime,
+          onChange: (selectedDates) => {
+            setForm((prev) => ({ ...prev, endTime: selectedDates[0].toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }));
+          },
+        });
+      }
     }
-  }, [open]);
+  }, [open]); // Ensures Flatpickr initializes when modal opens
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -134,11 +159,11 @@ export default function EventModel({
 
         <input
           name="date"
-          id="datePicker"
+          ref={datePickerRef}
           className="w-full border p-2 rounded"
           placeholder="Select Date"
           value={form.date}
-          onChange={handleChange}
+          readOnly
           required
         />
 
@@ -146,20 +171,20 @@ export default function EventModel({
           <>
             <input
               name="startTime"
-              id="startPicker"
+              ref={startPickerRef}
               className="w-full border p-2 rounded"
               placeholder="Start Time"
               value={form.startTime}
-              onChange={handleChange}
+              readOnly
               required
             />
             <input
               name="endTime"
-              id="endPicker"
+              ref={endPickerRef}
               className="w-full border p-2 rounded"
               placeholder="End Time"
               value={form.endTime}
-              onChange={handleChange}
+              readOnly
               required
             />
           </>
