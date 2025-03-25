@@ -27,8 +27,8 @@ const CalendarWrapper = ({ events, onEventClick, onDateClick }: CalendarWrapperP
   const formattedEvents = events.map((event) => ({
     id: event._id,
     title: event.title,
-    startTime: event.startTime ? `${event.date}T${event.startTime}` : event.date,
-    endTime: event.endTime ? `${event.date}T${event.endTime}` : undefined,
+    start: event.startTime ? `${event.date}T${event.startTime}` : event.date,
+    end: event.endTime ? `${event.date}T${event.endTime}` : undefined,
     allDay: !event.startTime && !event.endTime, // 👈 Set allDay only if no startTime/endTime
   }));
 
