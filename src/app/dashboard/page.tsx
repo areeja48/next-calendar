@@ -5,8 +5,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import FloatingActionButton from '@/components/FAB';
 import CalendarWrapper from '@/components/CalendarWrapper';
-import EventModal from '@/components/EventModel'; // ✅ Corrected name
-import GoogleCalendarEvents from '@/components/GetGoogleEvent';
+import EventModal from '@/components/EventModel'; 
+
 
 interface EventData {
   _id: string;
@@ -14,6 +14,14 @@ interface EventData {
   date: string;
   startTime?: string;
   endTime?: string;
+}
+
+interface GoogleEvents {
+  _id: string;
+  title: string;
+  start: string;  // Start time as string (in ISO format)
+  end: string;    // End time as string (in ISO format)
+  allDay: boolean; // Flag for all-day event
 }
 
 export default function DashboardPage() {
@@ -24,6 +32,7 @@ export default function DashboardPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [events, setEvents] = useState<EventData[]>([]);
+  const [googleEvents, setGoogleEvents] = useState<GoogleEvents[]>([]);
 
   const fetchEvents = async () => {
     try {
@@ -35,9 +44,20 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchGoogleEvents = async () => {
+    try {
+      const res = await fetch('/api/google/calendar/get_event');
+      const data = await res.json();
+      setGoogleEvents(data.events || []);  // Ensure data structure matches
+    } catch (error) {
+      console.error('Error fetching Google events:', error);
+    }
+  };
+
   useEffect(() => {
     if (session) {
       fetchEvents();
+      fetchGoogleEvents();
     }
   }, [session]);
 
@@ -55,13 +75,14 @@ export default function DashboardPage() {
     );
   }
 
+  // Pass both events and googleEvents to CalendarWrapper
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Sidebar placeholder if you have one */}
       <div className="ml-64 flex-1 flex flex-col">
         <main className="flex-1 p-6 pt-16 overflow-y-auto">
           <CalendarWrapper
-            events={events}
+            events={events}  // Pass events from database
+            googleEvents={googleEvents}  // Pass events from Google Calendar
             onEventClick={handleEdit}
             onDateClick={handleDateClick}
           />
@@ -69,11 +90,6 @@ export default function DashboardPage() {
 
         {/* Floating Action Button */}
         {!open && <FloatingActionButton onClick={handleCreate} />}
-
-        {/* Google Calendar Events Button */}
-        <div className="p-6">
-          <GoogleCalendarEvents />
-        </div>
 
         {/* Event Modal */}
         <EventModal

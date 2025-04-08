@@ -1,4 +1,3 @@
-// src/components/CalendarWrapper.tsx
 'use client';
 
 import FullCalendar from '@fullcalendar/react';
@@ -9,43 +8,74 @@ import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { EventClickArg } from '@fullcalendar/core';
 import '../app/globals.css';
 
-interface EventData {
+export interface EventData {
   _id: string;
   title: string;
-  date: string;
+  date: string; // Local events date (yyyy-mm-dd)
   startTime?: string;
   endTime?: string;
 }
 
+export interface GoogleEvents {
+  _id: string;
+  title: string;
+  start: string | { dateTime: string; timeZone: string };  // Start can be a string or an object with dateTime and timeZone
+  end: string | { dateTime: string; timeZone: string };    // End can be a string or an object with dateTime and timeZone
+  allDay: boolean; // Flag for all-day event
+}
+
 interface CalendarWrapperProps {
-  events: EventData[];
+  events: EventData[];  // Local events
+  googleEvents: GoogleEvents[];  // Google events
   onEventClick: (eventId: string) => void;
   onDateClick: (dateStr: string) => void;
 }
 
-const CalendarWrapper = ({ events, onEventClick, onDateClick }: CalendarWrapperProps) => {
+const CalendarWrapper = ({ events = [], googleEvents = [], onEventClick, onDateClick }: CalendarWrapperProps) => {
+  // Format local events
   const formattedEvents = events.map((event) => ({
     id: event._id,
     title: event.title,
-    start: event.startTime ? `${event.date}T${event.startTime}` : event.date,
-    end: event.endTime ? `${event.date}T${event.endTime}` : undefined,
-    allDay: !event.startTime && !event.endTime, // 👈 Set allDay only if no startTime/endTime
+    start: event.startTime ? `${event.date}T${event.startTime}` : event.date, // Use date + time or just date
+    end: event.endTime ? `${event.date}T${event.endTime}` : undefined, // Use date + time or undefined
+    allDay: !event.startTime && !event.endTime, // Mark as allDay if no startTime or endTime
   }));
+
+  // Format Google events (flatten start and end)
+  const googleEvent = googleEvents.map((event) => {
+    // Ensure start and end are in string format (flatten dateTime if necessary)
+    const start = typeof event.start === 'string' ? event.start : event.start.dateTime;
+    const end = typeof event.end === 'string' ? event.end : event.end.dateTime;
+
+    return {
+      id: event._id,
+      title: event.title,
+      start: start,  // Use dateTime if it's an object
+      end: end,      // Use dateTime if it's an object
+      allDay: event.allDay,
+    };
+  });
+
+  // Combine formatted local and Google events
+  const allEvents = [...formattedEvents, ...googleEvent];
+
+  // Log the combined events to check the structure
+  console.log("Combined Events:", allEvents);
 
   return (
     <FullCalendar
       plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
       initialView="dayGridMonth"
-      events={formattedEvents}
-      eventClick={(info: EventClickArg) => onEventClick(info.event.id)}
-      dateClick={(info: DateClickArg) => onDateClick(info.dateStr)}
+      events={allEvents}  // Pass the combined events array to FullCalendar
+      eventClick={(info: EventClickArg) => onEventClick(info.event.id)} // Handle event click
+      dateClick={(info: DateClickArg) => onDateClick(info.dateStr)} // Handle date click
       headerToolbar={{
         left: 'prev',
         center: 'title',
-        right: 'next dayGridMonth,listMonth', // 👈 Added more views
+        right: 'next dayGridMonth,listMonth', // Add additional views if needed
       }}
       height="auto"
-      selectable={true}
+      selectable={true}  // Allow selecting events
     />
   );
 };
