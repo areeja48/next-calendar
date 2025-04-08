@@ -10,7 +10,7 @@ import Contacts from './Contacts'; // Import the Contacts component
 const SideBar = () => {
   const pathname = usePathname();
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [showContacts] = useState(false); // State to toggle contacts
+  const [showContacts, setShowContacts] = useState(false); // State to toggle contacts
   const [loading, setLoading] = useState(false); // Loading state for syncing contacts
 
   const navItems = [
@@ -71,7 +71,7 @@ const SideBar = () => {
 
           {/* Sync Contacts Button */}
           <button
-            onClick={handleSyncContacts}
+             onClick={() => setShowContacts(!showContacts)}
             className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm rounded-xl transition-all"
             disabled={loading} // Disable button while loading
           >
