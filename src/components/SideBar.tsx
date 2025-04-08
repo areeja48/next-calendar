@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { LayoutDashboard, PlusCircle, Users, FolderSyncIcon } from 'lucide-react'; // Add Sync icon
+import { LayoutDashboard, PlusCircle, FolderSyncIcon } from 'lucide-react'; // Add Sync icon
 import { useState } from 'react';
 import CreateEventForm from './CreateGoogleEvent'; // Adjust path if needed
 import Contacts from './Contacts'; // Import the Contacts component
