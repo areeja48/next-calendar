@@ -11,7 +11,7 @@ const SideBar = () => {
   const pathname = usePathname();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showContacts, setShowContacts] = useState(false); // State to toggle contacts
-  const [loading, setLoading] = useState(false); // Loading state for syncing contacts
+  const [loading] = useState(false); // Loading state for syncing contacts
 
   const navItems = [
     { label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard size={18} /> },
