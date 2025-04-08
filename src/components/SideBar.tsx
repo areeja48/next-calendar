@@ -21,18 +21,6 @@ const SideBar = () => {
     console.log('Fetching events from Google Calendar...');
   };
 
-  const handleSyncContacts = async () => {
-    setLoading(true); // Start the loading state
-    try {
-      console.log('Syncing contacts...');
-      // Add your logic here for syncing contacts
-      // This could involve calling an API to sync contacts from Google to the database
-    } catch (error) {
-      console.error('Error syncing contacts:', error);
-    } finally {
-      setLoading(false); // Reset the loading state once done
-    }
-  };
 
   return (
     <div className="flex">
