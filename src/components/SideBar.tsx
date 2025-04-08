@@ -17,10 +17,21 @@ const SideBar = () => {
     { label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard size={18} /> },
   ];
 
- 
-
   const fetchEvents = async () => {
     console.log('Fetching events from Google Calendar...');
+  };
+
+  const handleSyncContacts = async () => {
+    setLoading(true); // Start the loading state
+    try {
+      console.log('Syncing contacts...');
+      // Add your logic here for syncing contacts
+      // This could involve calling an API to sync contacts from Google to the database
+    } catch (error) {
+      console.error('Error syncing contacts:', error);
+    } finally {
+      setLoading(false); // Reset the loading state once done
+    }
   };
 
   return (
@@ -60,7 +71,7 @@ const SideBar = () => {
 
           {/* Sync Contacts Button */}
           <button
-             onClick={() => setShowContacts(!showContacts)}
+            onClick={handleSyncContacts}
             className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm rounded-xl transition-all"
             disabled={loading} // Disable button while loading
           >
