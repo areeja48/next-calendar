@@ -33,7 +33,7 @@ export default function DashboardPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [events, setEvents] = useState<EventData[]>([]);
   const [googleEvents, setGoogleEvents] = useState<GoogleEvents[]>([]);
-
+ 
   const fetchEvents = async () => {
     try {
       const res = await fetch('/api/events');
@@ -54,6 +54,7 @@ export default function DashboardPage() {
     }
   };
 
+  
   useEffect(() => {
     if (session) {
       fetchEvents();
@@ -74,6 +75,8 @@ export default function DashboardPage() {
       </div>
     );
   }
+
+  
 
   // Pass both events and googleEvents to CalendarWrapper
   return (
@@ -102,7 +105,7 @@ export default function DashboardPage() {
       </div>
     </div>
   );
-
+  
   // Handlers
   function handleCreate() {
     setEditingId(null);
@@ -122,3 +125,4 @@ export default function DashboardPage() {
     setOpen(true);
   }
 }
+

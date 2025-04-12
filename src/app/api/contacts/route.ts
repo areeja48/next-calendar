@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
     for (const googleContact of googleContacts) {
       const displayName = googleContact.names?.[0]?.displayName || 'Unnamed Contact';
       const emailAddress = googleContact.emailAddresses?.[0]?.value || 'No email available';
+      const phoneNumber = googleContact.phoneNumbers?.[0]?.value || 'No phone available';
       const googleId = googleContact.resourceName?.split('/')[1];
       
       let contact = await Contact.findOne({ googleId });
@@ -38,11 +39,12 @@ export async function GET(req: NextRequest) {
       if (contact) {
         contact.displayName = displayName;
         contact.emailAddress = emailAddress;
+        contact.phoneNumber = phoneNumber;
         contact.updatedAt = Date.now();
         await contact.save();
         console.log(`Updated contact: ${displayName}`);
       } else {
-        contact = new Contact({ displayName, emailAddress, googleId });
+        contact = new Contact({ displayName, emailAddress, phoneNumber,  googleId });
         await contact.save();
         console.log(`Created new contact: ${displayName}`);
       }

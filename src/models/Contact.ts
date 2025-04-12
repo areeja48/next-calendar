@@ -3,6 +3,7 @@ import mongoose, { Schema, Document, models } from 'mongoose';
 export interface IContact extends Document {
   displayName: string;
   emailAddress: string;
+  phoneNumber: string;
   googleId: string; 
   createdAt?: Date;
   updatedAt?: Date;
@@ -11,6 +12,7 @@ export interface IContact extends Document {
 const ContactSchema = new Schema<IContact>({
   displayName: { type: String, required: true },
   emailAddress: { type: String, required: true },
+  phoneNumber: { type: String, required: true },
   googleId: { type: String, required: true, unique: true }, 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

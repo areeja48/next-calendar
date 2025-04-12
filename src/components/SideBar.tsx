@@ -1,16 +1,16 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { LayoutDashboard, PlusCircle, FolderSyncIcon } from 'lucide-react'; // Add Sync icon
 import { useState } from 'react';
 import CreateEventForm from './CreateGoogleEvent'; // Adjust path if needed
-import Contacts from './Contacts'; // Import the Contacts component
+
 
 const SideBar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [showContacts, setShowContacts] = useState(false); // State to toggle contacts
   const [loading] = useState(false); // Loading state for syncing contacts
 
   const navItems = [
@@ -59,12 +59,12 @@ const SideBar = () => {
 
           {/* Sync Contacts Button */}
           <button
-             onClick={() => setShowContacts(!showContacts)}
+            onClick={() => router.push('/contacts')}
             className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm rounded-xl transition-all"
-            disabled={loading} // Disable button while loading
+            disabled={loading}
           >
             {loading ? (
-              <span>Syncing...</span> // Show "Syncing..." text when loading
+              <span>Syncing...</span>
             ) : (
               <>
                 <FolderSyncIcon size={18} />
@@ -84,9 +84,6 @@ const SideBar = () => {
             fetchEvents={fetchEvents}
           />
         )}
-
-        {/* Render Contacts List */}
-        {showContacts && <Contacts />}
       </div>
     </div>
   );
